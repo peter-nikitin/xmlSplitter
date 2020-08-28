@@ -1,14 +1,16 @@
 var fs = require('fs')
+
 const path = require('path');
 const es = require('event-stream')
 const XmlSplit = require('xmlsplit')
+
 
 const xmlsplit = new XmlSplit(batchSize = 50000, tagName = "customer")
 
 // ---------------------
 // СЮДА ВВЕДИ НАЗВАНИЕ ПАПКИ ИЗ КОТОРОЙ НАДО ВЗЯТЬ И КУДА НАДО ПОЛОЖИТЬ
 const settings = {
-  "INPUT_FOLDER_NAME": "/data/test",
+  "INPUT_FOLDER_NAME": "/data/DetmirRu - Отчет по задаче 71121 - 27.08.2020 20-10",
   "OUTPUT_FOLDER_NAME": "/data/DetmirRu-small-chunks"
 }
 // ДАЛЬШЕ ЛУЧШЕ НИЧЕГО НЕ ТРОГАТЬ
@@ -23,15 +25,20 @@ const saveFile = (path, data) => {
 }
 
 
-const splitFile = (fileName) => {
+
+
+const splitFile = (index, array) => {
+
+  let nexIndex = index + 1;
+  const fileName = array[index];
   let chunckNumber = 0;
   var inputStream = fs.createReadStream(path.join(__dirname, `${settings.INPUT_FOLDER_NAME}/${fileName}`)) // from somewhere
 
-  if (!fs.existsSync(settings.OUTPUT_FOLDER_NAME)) {
-    fs.mkdirSync(settings.OUTPUT_FOLDER_NAME);
+  if (!fs.existsSync(path.join(__dirname, settings.OUTPUT_FOLDER_NAME))) {
+    fs.mkdirSync(path.join(__dirname, settings.OUTPUT_FOLDER_NAME));
   }
 
-  inputStream
+   inputStream
     .pipe(xmlsplit)
     .on('data', function(data) {
       var xmlDocument = data.toString()
@@ -51,18 +58,10 @@ const splitFile = (fileName) => {
 
     }).on("end", () => {
       console.log(`Done ${chunckNumber} chuncks`);
+      splitFile(nexIndex, array);
     });
 }
 
-const splitFileByNumber = (index, array) => {
-
-  let nexIndex = index + 1;
-  splitFile(array[index]);
-
-  if (nexIndex < array.length) {
-    splitFileByNumber(nexIndex, array)
-  }
-}
 
 const getFilesFromFolder = (folder) => {
   const arrayOfItems = [];
@@ -71,8 +70,6 @@ const getFilesFromFolder = (folder) => {
   filesInFolder.forEach((file) => arrayOfItems.push(file))
 
   console.log(`Get ${filesInFolder.length} files& Start spliting`);
-
-  console.log("End Splitting");
   return arrayOfItems;
 }
 
@@ -80,8 +77,8 @@ const getFilesFromFolder = (folder) => {
 const getFilesAndSplit = (settings) => {
   const filesArray = getFilesFromFolder(settings.INPUT_FOLDER_NAME);
 
-  splitFileByNumber(0, filesArray)
-
+  splitFile(0, filesArray)
+  console.log("End Splitting");
 }
 
 
