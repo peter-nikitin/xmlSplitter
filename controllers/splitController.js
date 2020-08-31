@@ -1,39 +1,28 @@
-кconst fs = require('fs')
+const fs = require('fs')
 
 const path = require('path');
 const XmlSplit = require('xmlsplit');
+const async = require('async');
+
 
 class SplitController {
   constructor(filesArray, settings) {
-    this.maxThred = 10;
+    this.maxThred = 1;
     this.usedThred = 0;
-    this.totalFilesCount = 0;
     this.splitedFilesCount = 0;
     this.files = filesArray;
     this.settings = settings;
     this.batchSize = 50000;
     this.tagName = "customer";
-    this.xmlsplit = new XmlSplit(this.batchSize, this.tagName);
+
     this.savingErrors = [];
+    // this.getFileAndSplit();
   }
 
   getFileAndSplit() {
-    if (this.splitedFilesCount < this.totalFilesCount) {
-      this.splitFile(this.files[this.splitedFilesCount]);
-
-      this.splitedFilesCount += 1;
-      this.usedThred += 1;
-    } else {
-      console.log(`Разделение закончено. Еще потоков: ${this.usedThred}`)
-    }
-  }
-
-  init() {
-    for (this.usedThred; this.usedThred < this.maxThred; this.usedThred = +1) {
-
-      this.splitFile(this.files[this.usedThred]);
-
-    }
+    return async.mapSeries(this.files, (item, callback) => {
+      return this.splitFile(item, callback);
+    });
   }
 
   saveFile(targetPath, data) {
@@ -45,40 +34,41 @@ class SplitController {
   }
 
 
+  splitFile(fileName, callback) {
+    this.chunckNumber = 0;
+    const inputStream = fs.createReadStream(path.join(__dirname, `../${this.settings.INPUT_FOLDER_NAME}/${fileName}`)) // from somewhere
 
+    const xmlsplit = new XmlSplit(this.batchSize, this.tagName);
 
-  splitFile(fileName) {
-
-    let chunckNumber = 0;
-    const inputStream = fs.createReadStream(path.join(__dirname, `${this.settings.INPUT_FOLDER_NAME}/${fileName}`)) // from somewhere
-
-    if (!fs.existsSync(path.join(__dirname, this.settings.OUTPUT_FOLDER_NAME))) {
-      fs.mkdirSync(path.join(__dirname, this.settings.OUTPUT_FOLDER_NAME));
+    if (!fs.existsSync(path.join(__dirname, `../${this.settings.OUTPUT_FOLDER_NAME}`))) {
+      fs.mkdirSync(path.join(__dirname, `../${this.settings.OUTPUT_FOLDER_NAME}`));
     }
+
+    const outputFolder = `../${this.settings.OUTPUT_FOLDER_NAME}`;
+
+    if (!fs.existsSync(path.join(__dirname, outputFolder))) {
+      fs.mkdirSync(path.join(__dirname, outputFolder));
+    }
+
+    xmlsplit.on('error', err => callback(err));
+    inputStream.on('error', err => {
+      callback(err)
+    });
 
 
     inputStream
-      .pipe(this.xmlsplit)
+      .pipe(xmlsplit)
       .on('data', (data) => {
-        const xmlDocument = data.toString()
+        const xmlDocument = data.toString();
+        const outPutFileName = `${outputFolder}/${fileName.split(".")[0]}-chunck-${this.chunckNumber}.xml`;
 
-        const outPutFileName = `${fileName.split(".")[0]}-chunck-${chunckNumber}.xml`;
-        const outputFolder = `/${this.settings.OUTPUT_FOLDER_NAME}/${fileName.split(".")[0]}-chuncks`;
-        const outputFilePath = `/${outputFolder}/${outPutFileName}`;
-
-        if (!fs.existsSync(path.join(__dirname, outputFolder))) {
-          fs.mkdirSync(path.join(__dirname, outputFolder));
-        }
-
-        this.saveFile(path.join(__dirname, outputFilePath), xmlDocument);
-
-        chunckNumber += 1;
+        this.saveFile(path.join(__dirname, outPutFileName), xmlDocument);
+        this.chunckNumber += 1;
       }).on("end", () => {
-        console.log(`Done ${chunckNumber} chuncks`);
-        this.usedThred -= 1;
-
-        this.getFileAndSplit();
+        console.log(`Done ${this.chunckNumber} chuncks`);
+        callback();
       });
+
   }
 }
 
