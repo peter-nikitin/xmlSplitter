@@ -3,6 +3,7 @@ const fs = require('fs')
 const path = require('path');
 const XmlSplit = require('xmlsplit');
 const async = require('async');
+const { throws } = require('assert');
 
 
 class SplitController {
@@ -12,8 +13,8 @@ class SplitController {
     this.splitedFilesCount = 0;
     this.files = filesArray;
     this.settings = settings;
-    this.batchSize = 50000;
-    this.tagName = "customer";
+    this.batchSize = settings.ITEMS_PER_CHUNCK;
+    this.tagName = settings.TAG_NAME;
 
     this.savingErrors = [];
     // this.getFileAndSplit();
@@ -39,19 +40,25 @@ class SplitController {
     const inputStream = fs.createReadStream(path.join(__dirname, `../${this.settings.INPUT_FOLDER_NAME}/${fileName}`)) // from somewhere
 
     const xmlsplit = new XmlSplit(this.batchSize, this.tagName);
-
-    if (!fs.existsSync(path.join(__dirname, `../${this.settings.OUTPUT_FOLDER_NAME}`))) {
-      fs.mkdirSync(path.join(__dirname, `../${this.settings.OUTPUT_FOLDER_NAME}`));
-    }
-
     const outputFolder = `../${this.settings.OUTPUT_FOLDER_NAME}`;
 
-    if (!fs.existsSync(path.join(__dirname, outputFolder))) {
-      fs.mkdirSync(path.join(__dirname, outputFolder));
+    if (!fs.existsSync(path.join(__dirname, `${outputFolder}`))) {
+      fs.mkdirSync(path.join(__dirname, `${outputFolder}`));
     }
 
-    xmlsplit.on('error', err => callback(err));
+
+    xmlsplit.on('error', err => {
+      if (err) {
+        const error = new Error(err);
+        throw error;
+      };
+      callback(err)
+    });
     inputStream.on('error', err => {
+      if (err) {
+        const error = new Error(err);
+        throw error;
+      };
       callback(err)
     });
 
@@ -59,8 +66,13 @@ class SplitController {
     inputStream
       .pipe(xmlsplit)
       .on('data', (data) => {
-        const xmlDocument = data.toString();
         const outPutFileName = `${outputFolder}/${fileName.split(".")[0]}-chunck-${this.chunckNumber}.xml`;
+
+        let xmlDocument = data.toString().replace('</result>', `</${this.tagName}s></result>`)
+
+        if (this.chunckNumber > 0) {
+          xmlDocument = xmlDocument.replace('<result>', `<result><${this.tagName}s>`)
+        }
 
         this.saveFile(path.join(__dirname, outPutFileName), xmlDocument);
         this.chunckNumber += 1;
