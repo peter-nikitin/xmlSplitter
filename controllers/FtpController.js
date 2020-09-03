@@ -50,24 +50,29 @@ class FtpController {
       this.ftpClient.list(targetFtpPath, false, (err, list) => {
         if (err) rejects(err);
         list.forEach((item) => {
-          if (path.extname(item.name) === ".xml" || path.extname(item.name) === ".gz") {
-            this.filesInFolder.push(iconv.decode(item.name, "win1251"));
-          }
+          this.filesInFolder.push(item.name);
+          // if (path.extname(item.name) === ".xml" || path.extname(item.name) === ".gz") {
+          //   this.filesInFolder.push(iconv.decode(item.name, "win1251"));
+          // }
         });
         resolve(this.filesInFolder);
       })
     });
   }
 
-  downloadFile(targetFile, targetPath, collback) {
+  downloadFile(pathOnFTP, targetFile, targetPath, collback) {
+    this.targetFolderOnFTP = pathOnFTP;
+
     if (!fs.existsSync(path.join(__dirname, `../${targetPath}`))) {
       fs.mkdirSync(path.join(__dirname, `../${targetPath}`));
     }
-    console.log(`${this.targetFileOnFtp}/${targetFile}`);
-    this.ftpClient.get(`${this.targetFileOnFtp}/${targetFile}`, (err, stream) => {
-      console.log(stream);
-      console.log(err);
-      stream.pipe(path.extname(targetFile) === ".gz" ? unzipper.Extract({ path: `${targetPath}/${targetFile}` }) : fs.createWriteStream(`${targetPath}/${targetFile}`));
+
+    console.log(`${this.targetFolderOnFTP}/${targetFile}`);
+
+    this.ftpClient.get(`/${this.targetFolderOnFTP}/${targetFile}`, (err, stream) => {
+      if (err) console.log(err);
+      stream.pipe(fs.createWriteStream(`${targetPath}/${targetFile}`));
+      // stream.pipe(path.extname(targetFile) === ".gz" ? unzipper.Extract({ path: `${targetPath}/${targetFile}` }) : fs.createWriteStream(`${targetPath}/${targetFile}`));
 
 
       stream.on('end', () => {
