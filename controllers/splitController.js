@@ -3,7 +3,6 @@ const fs = require('fs')
 const path = require('path');
 const XmlSplit = require('xmlsplit');
 const async = require('async');
-const { throws } = require('assert');
 
 
 class SplitController {
