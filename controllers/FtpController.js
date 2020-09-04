@@ -2,8 +2,6 @@ const Client = require('ftp');
 const path = require('path');
 const fs = require('fs')
 const async = require('async');
-const unzipper = require('unzipper');
-const iconv = require("iconv-lite");
 
 
 const FTP_STATUSES = {
@@ -123,11 +121,20 @@ class FtpController {
   }
 
   uploadFile(file, pathOnFTP, collback) {
-    console.log(file);
     return new Promise((resolve, reject) => {
       this.ftpClient.append(file, pathOnFTP, (err) => {
-        if (err) throw err;
+        if (err) reject(err);
         resolve(collback());
+      });
+    })
+  }
+
+  uploadChunck(file, pathOnFTP) {
+    console.log(`Start uploading file: ${pathOnFTP}`);
+    return new Promise((resolve, reject) => {
+      this.ftpClient.append(file, pathOnFTP, (err) => {
+        if (err) reject(err);
+        resolve(() => console.log(`Done file: ${pathOnFTP}`));
       });
     })
   }
