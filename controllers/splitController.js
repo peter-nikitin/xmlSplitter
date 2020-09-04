@@ -1,12 +1,11 @@
-const fs = require('fs')
+const fs = require("fs");
 
-const path = require('path');
-const XmlSplit = require('xmlsplit');
-const async = require('async');
-
+const path = require("path");
+const XmlSplit = require("xmlsplit");
+const async = require("async");
 
 class SplitController {
-  constructor(filesArray, settings) {
+  constructor(settings, filesArray = []) {
     this.maxThred = 1;
     this.usedThred = 0;
     this.splitedFilesCount = 0;
@@ -14,7 +13,7 @@ class SplitController {
     this.settings = settings;
     this.batchSize = settings.ITEMS_PER_CHUNCK;
     this.tagName = settings.TAG_NAME;
-
+    this.splitFile = this.splitFile.bind(this);
     this.savingErrors = [];
     // this.getFileAndSplit();
   }
@@ -33,10 +32,8 @@ class SplitController {
     });
   }
 
-
-  splitFile(fileName, callback) {
+  splitFile(inputStream, outputStream) {
     this.chunckNumber = 0;
-    const inputStream = fs.createReadStream(path.join(__dirname, `../${this.settings.INPUT_FOLDER_NAME}/${fileName}`)) // from somewhere
 
     const xmlsplit = new XmlSplit(this.batchSize, this.tagName);
     const outputFolder = `../${this.settings.OUTPUT_FOLDER_NAME}`;
@@ -45,41 +42,38 @@ class SplitController {
       fs.mkdirSync(path.join(__dirname, `${outputFolder}`));
     }
 
-
-    xmlsplit.on('error', err => {
-      if (err) {
-        const error = new Error(err);
-        throw error;
-      };
-      callback(err)
-    });
-    inputStream.on('error', err => {
-      if (err) {
-        const error = new Error(err);
-        throw error;
-      };
-      callback(err)
-    });
-
-
-    inputStream
-      .pipe(xmlsplit)
-      .on('data', (data) => {
-        const outPutFileName = `${outputFolder}/${fileName.split(".")[0]}-chunck-${this.chunckNumber}.xml`;
-
-        let xmlDocument = data.toString().replace('</result>', `</${this.tagName}s></result>`)
-
-        if (this.chunckNumber > 0) {
-          xmlDocument = xmlDocument.replace('<result>', `<result><${this.tagName}s>`)
+    return new Promise((resolve, reject) => {
+      xmlsplit.on("error", (err) => {
+        if (err) {
+          reject(new Error(err));
         }
-
-        this.saveFile(path.join(__dirname, outPutFileName), xmlDocument);
-        this.chunckNumber += 1;
-      }).on("end", () => {
-        console.log(`Done ${this.chunckNumber} chuncks`);
-        callback();
+      });
+      inputStream.on("error", (err) => {
+        if (err) {
+          reject(new Error(err));
+        }
       });
 
+      inputStream
+        .pipe(xmlsplit)
+        .on("data", (data) => {
+          let xmlDocument = data
+            .toString()
+            .replace("</result>", `</${this.tagName}s></result>`);
+          if (this.chunckNumber > 0) {
+            xmlDocument = xmlDocument.replace(
+              "<result>",
+              `<result><${this.tagName}s>`
+            );
+          }
+          outputStream(xmlDocument, this.chunckNumber);
+          this.chunckNumber += 1;
+        })
+        .on("end", () => {
+          console.log(`Done spliiting. Total: ${this.chunckNumber} chuncks`);
+          resolve();
+        });
+    });
   }
 }
 
