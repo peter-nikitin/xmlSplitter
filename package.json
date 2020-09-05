@@ -1,30 +1,16 @@
 {
-  "name": "y",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "xmlsplit",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/www"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "async": "3.2.0",
-    "axios": "0.20.0",
-    "detect-character-encoding": "^0.8.0",
-    "dotenv": "8.2.0",
-    "ftp": "0.3.10",
-    "iconv-lite": "0.6.2",
-    "unzipper": "0.10.11",
-    "utf8": "3.0.0",
-    "xmlsplit": "1.2.8"
-  },
-  "devDependencies": {
-    "eslint": "^7.7.0",
-    "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.22.0",
-    "event-stream": "4.0.1",
-    "prettier": "2.1.1"
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1"
   }
 }
