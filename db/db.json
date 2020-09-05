@@ -1,0 +1,16 @@
+{
+  "operations": [
+    {
+      "NAME": "customers-merges",
+      "OUTPUT_FOLDER_NAME_ON_FTP": "test-chuncks",
+      "TAG_NAME": "customerAction",
+      "ITEMS_PER_CHUNCK": 50000,
+      "OPERATION_NAME": "TestExportDeduplications",
+      "EXPORT_PERIOD_HOURS": 24,
+      "CRON_TIME": "0 39 18 * * *"
+    },
+    {}
+  ],
+  "customers": [],
+  "customers-merges": []
+}
