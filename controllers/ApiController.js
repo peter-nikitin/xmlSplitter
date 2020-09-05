@@ -2,16 +2,16 @@ const axios = require("axios");
 const async = require("async");
 
 class ApiController {
-  constructor({ OPERATION_NAME, OUTPUT_FOLDER_NAME_ON_FTP, EXPORT_PERIOD_HOURS, TAG_NAME }, ftp) {
+  constructor(settings, ftp) {
     this.endpoint = process.env.ENDPOINT;
     this.secretKey = process.env.SECRET_KEY;
-    this.operation = OPERATION_NAME;
-    this.targetLocalPath = OUTPUT_FOLDER_NAME_ON_FTP;
+    this.operation = settings.OPERATION_NAME;
+    this.targetPath = settings.OUTPUT_FOLDER_NAME_ON_FTP;
     this.taskID = 0;
-    this.exportPeriodHours = EXPORT_PERIOD_HOURS;
+    this.exportPeriodHours = settings.EXPORT_PERIOD_HOURS;
     this.urlsFromExport = [];
     this.ftp = ftp;
-    this.exportName = TAG_NAME;
+    this.exportName = settings.TAG_NAME;
   }
 
   startExport() {
@@ -44,7 +44,9 @@ class ApiController {
     return new Promise((resolve, reject) => {
       this.interval = setInterval(() => {
         this.checkExportTask(taskID).then((response) => {
-          console.log(`task status: ${response.data.exportResult.processingStatus}`);
+          console.log(
+            `task status: ${response.data.exportResult.processingStatus}`
+          );
 
           if (response.status !== 200) reject(new Error("Status not 200"));
           if (response.data.exportResult.processingStatus === "Ready") {
@@ -76,11 +78,7 @@ class ApiController {
 
   downloadAllFiles(filesArray, outputStreamHendler) {
     return async.mapSeries(filesArray, (item, collback) =>
-      this.downloadResultFile(
-        item,
-        outputStreamHendler,
-        collback
-      )
+      this.downloadResultFile(item, outputStreamHendler, collback)
     );
   }
 
@@ -91,14 +89,18 @@ class ApiController {
         method: "get",
         responseType: "stream",
       }).then((response) => {
-        if (response.status !== 200) reject(new Error("Status no 200"))
-        streamHendler(response.data, (data, chunk) =>
-          this.ftp.uploadFile(
-            data,
-            `/${this.targetLocalPath}/export-${this.exportName}-${this.taskID}-${chunk}.xml`, collback))
-      })
-    })
-
+        if (response.status !== 200) reject(new Error("Status no 200"));
+        streamHendler(
+          response.data,
+          (data, chunk) =>
+            this.ftp.uploadFile(
+              data,
+              `/${this.targetPath}/export-${this.exportName}-${this.taskID}-${chunk}.xml`
+            ),
+          collback
+        );
+      });
+    });
   }
 }
 
