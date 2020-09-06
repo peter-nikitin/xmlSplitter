@@ -1,59 +1,30 @@
-const { CronJob } = require("cron");
-const FtpController = require("./FtpController");
-const ApiController = require("./ApiController");
-const SplitController = require("./splitController");
+const CronModel = require("../models/CronModel");
+const db = require("../db");
 
 class CronController {
-  constructor(settings) {
-    this.settings = settings;
-    this.cronTime = settings.CRON_TIME;
-    this.onComplete = null;
-    this.start = true;
-    this.timeZone = "Europe/Moscow";
-    this.context = null;
-    this.runOnInit = false;
-    this.FTP = new FtpController(this.settings);
-    this.splitController = new SplitController(this.settings);
-    this.apiController = new ApiController(this.settings, this.FTP);
-    this.tick = this.tick.bind(this);
-    this.init();
+  constructor() {
+    this.cron = 1;
   }
 
-  init() {
-    this.job = new CronJob(
-      this.cronTime,
-      this.tick,
-      this.onComplete,
-      this.start,
-      this.timeZone,
-      this.context,
-      this.runOnInit
-    );
+  setCronJob(operationSettings) {
+    console.log(`start ${operationSettings.NAME}`);
+    this[operationSettings.NAME] = new CronModel(operationSettings);
+    db.saveLogs(operationSettings.NAME, {
+      date: new Date(),
+      data: `Поставлена регулярная задача. Следующее выполнение ${new Date(
+        this[operationSettings.NAME].getNextDate()
+      ).toLocaleString("ru-RU")}`,
+    });
   }
 
-  getNextDate() {
-    return this.job.nextDates();
-  }
-
-  getLastDate() {
-    return this.job.lastDate();
-  }
-
-  tick() {
-    this.apiController
-      .startExport()
-      .then((response) =>
-        this.apiController.startCheckingExportTask(response.data.exportId)
-      )
-      .then((urlsArray) =>
-        this.apiController.downloadAllFiles(
-          urlsArray,
-          this.splitController.splitFile
-        )
-      )
-      .then(() => console.log("Done export, splittin and uploading"))
-      .catch((err) => console.log(err));
+  getCronJob(name) {
+    if (typeof this[name] === "undefind") return { status: "notFound" };
+    return {
+      status: "found",
+      nextTick: this[name].getNextDate(),
+      lastTick: this[name].getLastDate(),
+    };
   }
 }
 
-module.exports = CronController;
+module.exports = new CronController();
