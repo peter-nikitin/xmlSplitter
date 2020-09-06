@@ -1,24 +1,22 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import "semantic-ui/dist/semantic.min.css";
+import { Container, Header } from "semantic-ui-react";
+
+import ButtonExampleButton from "./components/btn";
+import OperationsList from "./components/operationsList";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Container>
+        <Header as="h1" size="huge">
+          ✂️ xml splitter
+          <Header.Subheader>Разрезаем файлики</Header.Subheader>
+        </Header>
+        <OperationsList />
+      </Container>
     </div>
   );
 }
