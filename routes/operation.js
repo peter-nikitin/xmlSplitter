@@ -1,11 +1,15 @@
 const express = require("express");
 const router = express.Router();
+const CronController = require("../controllers/CronController");
 
 const db = require("../db/index");
 
 router.get("/", (req, res, next) => {
   res.json(db.getOperations());
-  console.log(db.getOperations());
+});
+
+router.get("/:operation", (req, res, next) => {
+  res.json(CronController.getCronJob(req.params.operation));
 });
 
 router.post("/", (req, res, next) => {
