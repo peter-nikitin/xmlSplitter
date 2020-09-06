@@ -1,13 +1,12 @@
 {
-  "operations": [
-    {
+  "operations": [{
       "NAME": "customers",
       "OUTPUT_FOLDER_NAME_ON_FTP": "test-chuncks",
       "TAG_NAME": "customer",
       "ITEMS_PER_CHUNCK": 50000,
       "OPERATION_NAME": "exportSegmentsPart3",
       "EXPORT_PERIOD_HOURS": 24,
-      "CRON_TIME": "0 03 23 * * *"
+      "CRON_TIME": "0 30 11 * * *"
     },
     {
       "NAME": "customers-merges",
@@ -16,11 +15,10 @@
       "ITEMS_PER_CHUNCK": 50000,
       "OPERATION_NAME": "TestExportDeduplications",
       "EXPORT_PERIOD_HOURS": 24,
-      "CRON_TIME": "0 02 23 * * *"
+      "CRON_TIME": "0 0 11 * * *"
     }
   ],
-  "customers": [
-    {
+  "customers": [{
       "date": "2020-09-06T20:01:36.274Z",
       "data": "Поставлена регулярная задача. Следующее выполнение 9/6/2020, 11:03:00 PM"
     },
@@ -49,8 +47,7 @@
       "data": "✅ Успешно завершено. Экспортировано, поделено, загружено на ФТП"
     }
   ],
-  "customers-merges": [
-    {
+  "customers-merges": [{
       "date": "2020-09-06T20:01:36.281Z",
       "data": "Поставлена регулярная задача. Следующее выполнение 9/6/2020, 11:02:00 PM"
     },
