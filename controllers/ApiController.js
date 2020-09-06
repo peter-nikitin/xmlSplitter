@@ -1,5 +1,6 @@
 const axios = require("axios");
 const async = require("async");
+const db = require("../db");
 
 class ApiController {
   constructor(settings, ftp) {
@@ -12,6 +13,7 @@ class ApiController {
     this.urlsFromExport = [];
     this.ftp = ftp;
     this.exportName = settings.TAG_NAME;
+    this.settings = settings;
   }
 
   startExport() {
@@ -36,7 +38,10 @@ class ApiController {
   }
 
   startCheckingExportTask(taskID) {
-    console.log(`export ID: ${taskID}`);
+    db.saveLogs(this.settings.NAME, {
+      date: new Date(),
+      data: `Поставлена задача экспорта №: ${taskID}`,
+    });
     this.taskID = taskID;
     const intervalMinuts = 1.0;
     const intervalMiliseconds = intervalMinuts * 60 * 1000;
@@ -44,9 +49,10 @@ class ApiController {
     return new Promise((resolve, reject) => {
       this.interval = setInterval(() => {
         this.checkExportTask(taskID).then((response) => {
-          console.log(
-            `task status: ${response.data.exportResult.processingStatus}`
-          );
+          db.saveLogs(this.settings.NAME, {
+            date: new Date(),
+            data: `Проверяем задачу. Статус: ${response.data.exportResult.processingStatus}`,
+          });
 
           if (response.status !== 200) reject(new Error("Status not 200"));
           if (response.data.exportResult.processingStatus === "Ready") {

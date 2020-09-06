@@ -1,11 +1,13 @@
 const fs = require("fs");
 const XmlSplit = require("xmlsplit");
 const async = require("async");
+const db = require("../db");
 
 class SplitController {
   constructor(settings) {
     this.batchSize = settings.ITEMS_PER_CHUNCK;
     this.tagName = settings.TAG_NAME;
+    this.settings = settings;
     this.splitFile = this.splitFile.bind(this);
     this.savingErrors = [];
   }
@@ -57,7 +59,10 @@ class SplitController {
           this.chunckNumber += 1;
         })
         .on("end", () => {
-          console.log(`Done spliiting. Total: ${this.chunckNumber} chuncks`);
+          db.saveLogs(this.settings.NAME, {
+            date: new Date(),
+            data: `✂️  Поделили файлик на ${this.chunckNumber} кусков. `,
+          });
           collback();
           resolve();
         });
