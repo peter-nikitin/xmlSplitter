@@ -6,7 +6,7 @@ const OperationsList = (props) => {
   const [operations, handleOperationsChange] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/operation")
+    fetch("/operation")
       .then((response) => response.json())
       .then((response) => handleOperationsChange(response))
       .catch((err) => console.log(err));

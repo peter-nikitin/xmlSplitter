@@ -8,13 +8,13 @@ const Operation = ({ data }) => {
   const [ticks, handleTicksChange] = useState([]);
 
   const executeOperation = () => {
-    fetch(`http://localhost:8080/operation/execute/${data.NAME}`, {
+    fetch(`/operation/execute/${data.NAME}`, {
       method: "post",
     }).then((response) => response.json());
   };
 
   useEffect(() => {
-    fetch(`http://localhost:8080/operation/${data.NAME}`)
+    fetch(`/operation/${data.NAME}`)
       .then((response) => response.json())
       .then((response) => {
         if (response.status === "found") {
