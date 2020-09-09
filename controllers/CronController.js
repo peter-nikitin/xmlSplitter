@@ -18,7 +18,7 @@ class CronController {
   }
 
   getCronJob(name) {
-    if (typeof this[name] === "undefind") return { status: "notFound" };
+    if (typeof this[name] === "undefined") return { status: "notFound" };
     return {
       status: "found",
       nextTick: this[name].getNextDate(),
