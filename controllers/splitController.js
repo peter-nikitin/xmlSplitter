@@ -21,7 +21,10 @@ class SplitController {
   saveFile(targetPath, data) {
     fs.writeFile(targetPath, data, (err) => {
       if (err) {
-        this.savingErrors.push(err);
+        db.saveLogs(this.settings.NAME, {
+          date: new Date(),
+          data: `Ошибка сохранения ${err} `,
+        });
       }
     });
   }
