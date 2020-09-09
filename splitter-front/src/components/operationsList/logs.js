@@ -6,7 +6,6 @@ const Logs = ({ operation }) => {
   const [isLoading, handlIsLoadingChenge] = useState(true);
 
   const loadLogs = () => {
-    handlIsLoadingChenge(true);
     fetch(`/logs/${operation}`)
       .then((response) => response.json())
       .then((data) => {
