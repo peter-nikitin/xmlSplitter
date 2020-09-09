@@ -58,7 +58,12 @@ class CronModel {
           data: `✅ Успешно завершено. Экспортировано, поделено, загружено на ФТП`,
         })
       )
-      .catch((err) => console.log(err));
+      .catch((err) =>
+        db.saveLogs(this.settings.NAME, {
+          date: new Date(),
+          data: `❌ Ошибка: ${err}`,
+        })
+      );
   }
 }
 
