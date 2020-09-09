@@ -1,9 +1,10 @@
 const axios = require("axios");
 const async = require("async");
+const path = require("path");
 const db = require("../db");
 
 class ApiController {
-  constructor(settings, ftp) {
+  constructor(settings, outputStream) {
     this.endpoint = process.env.ENDPOINT;
     this.secretKey = process.env.SECRET_KEY;
     this.operation = settings.OPERATION_NAME;
@@ -11,7 +12,7 @@ class ApiController {
     this.taskID = 0;
     this.exportPeriodHours = settings.EXPORT_PERIOD_HOURS;
     this.urlsFromExport = [];
-    this.ftp = ftp;
+    this.outputStream = outputStream;
     this.exportName = settings.TAG_NAME;
     this.settings = settings;
   }
@@ -94,18 +95,20 @@ class ApiController {
         url,
         method: "get",
         responseType: "stream",
-      }).then((response) => {
-        if (response.status !== 200) reject(new Error("Status no 200"));
-        streamHendler(
-          response.data,
-          (data, chunk) =>
-            this.ftp.uploadFile(
-              data,
-              `/${this.targetPath}/export-${this.exportName}-${this.taskID}-${chunk}.xml`
-            ),
-          collback
-        );
-      });
+      })
+        .then((response) => {
+          if (response.status !== 200) reject(new Error("Status no 200"));
+          streamHendler(
+            response.data,
+            (data, chunk) =>
+              this.outputStream(
+                `/${this.targetPath}/export-${this.exportName}-${this.taskID}-${chunk}.xml`,
+                data
+              ),
+            collback
+          );
+        })
+        .catch((err) => reject(err));
     });
   }
 }
