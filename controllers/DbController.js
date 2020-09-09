@@ -57,7 +57,7 @@ class DbController {
   }
 
   getLogs(operation) {
-    return this.db.get(operation).sortBy("date").take(10).value();
+    return this.db.get(operation).value();
   }
 
   saveOperation(operation) {
@@ -66,6 +66,7 @@ class DbController {
   }
 
   saveLogs(operationName, log) {
+    console.log(log);
     this.db.get(operationName).push(log).write();
   }
 }
