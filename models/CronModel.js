@@ -15,7 +15,7 @@ class CronModel {
     this.runOnInit = false;
     this.FTP = new FtpController(this.settings);
     this.splitController = new SplitController(this.settings);
-    this.apiController = new ApiController(this.settings, this.FTP);
+    this.apiController = new ApiController(this.settings, this.FTP.uploadFile);
     this.tick = this.tick.bind(this);
     this.init();
   }
