@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Card, Image, Checkbox, Grid } from "semantic-ui-react";
+import { Button, Card, Image, Checkbox, Grid, List } from "semantic-ui-react";
 
 import Logs from "./logs";
 
@@ -29,56 +29,79 @@ const Operation = ({ data }) => {
 
   return (
     <>
-      <Grid>
+      <Grid stackable>
         <Grid.Row>
           <Grid.Column width={6}>
             <Card fluid>
               <Card.Content>
-                <Grid>
-                  <Grid.Column width={12}>
-                    <Card.Header>{data.NAME} </Card.Header>
-                    <Card.Meta>
-                      {ticks.lastTick && (
-                        <span>
-                          Пред. запуск:{" "}
-                          {new Date(ticks.lastTick).toLocaleString("ru-RU")}
-                        </span>
-                      )}
-                      {ticks.nextTick && (
-                        <span>
-                          След. запуск:{" "}
-                          {new Date(ticks.nextTick).toLocaleString("ru-RU")}
-                        </span>
-                      )}
-                    </Card.Meta>
-                  </Grid.Column>
-                  <Grid.Column width={4}>
-                    {isActive ? (
-                      <Checkbox toggle checked />
-                    ) : (
-                      <Checkbox toggle />
-                    )}
-                  </Grid.Column>
-                </Grid>
+                <Card.Header>{data.NAME} </Card.Header>
+
+                <Card.Meta>
+                  {ticks.lastTick && (
+                    <span>
+                      Пред. запуск:{" "}
+                      {new Date(ticks.lastTick).toLocaleString("ru-RU")}
+                    </span>
+                  )}
+                  {ticks.nextTick && (
+                    <span>
+                      След. запуск:{" "}
+                      {new Date(ticks.nextTick).toLocaleString("ru-RU")}
+                    </span>
+                  )}
+                </Card.Meta>
               </Card.Content>
               <Card.Content>
                 <Card.Description>
-                  <p>
-                    <b>Целевая папка на ФТП</b>:{" "}
-                    {data.OUTPUT_FOLDER_NAME_ON_FTP}
-                  </p>
-                  <p>
-                    <b>Тег, по которому резать</b>: {data.TAG_NAME}
-                  </p>
-                  <p>
-                    <b>Количество записей в кусочке</b>: {data.ITEMS_PER_CHUNCK}
-                  </p>
-                  <p>
-                    <b>Имя метода экспорта</b>: {data.OPERATION_NAME}
-                  </p>
-                  <p>
-                    <b>Период экспорта в часах</b>: {data.EXPORT_PERIOD_HOURS}
-                  </p>
+                  <List divided relaxed>
+                    <List.Item>
+                      <List.Content>
+                        <List.Header as="p">Целевая папка на ФТП</List.Header>
+                        <List.Description as="p">
+                          {" "}
+                          {data.OUTPUT_FOLDER_NAME_ON_FTP}
+                        </List.Description>
+                      </List.Content>
+                    </List.Item>
+                    <List.Item>
+                      <List.Content>
+                        <List.Header as="p">
+                          Тег, по которому резать
+                        </List.Header>
+                        <List.Description as="p">
+                          {data.TAG_NAME}
+                        </List.Description>
+                      </List.Content>
+                    </List.Item>
+                    <List.Item>
+                      <List.Content>
+                        <List.Header as="p">
+                          Целевое количество записей
+                        </List.Header>
+                        <List.Description as="p">
+                          {data.ITEMS_PER_CHUNCK}
+                        </List.Description>
+                      </List.Content>
+                    </List.Item>
+                    <List.Item>
+                      <List.Content>
+                        <List.Header as="p">Имя метода экспорта</List.Header>
+                        <List.Description as="p">
+                          {data.OPERATION_NAME}
+                        </List.Description>
+                      </List.Content>
+                    </List.Item>
+                    <List.Item>
+                      <List.Content>
+                        <List.Header as="p">
+                          Период экспорта в часах
+                        </List.Header>
+                        <List.Description as="p">
+                          {data.EXPORT_PERIOD_HOURS}
+                        </List.Description>
+                      </List.Content>
+                    </List.Item>
+                  </List>
                 </Card.Description>
               </Card.Content>
               {/* <Card.Content extra>
