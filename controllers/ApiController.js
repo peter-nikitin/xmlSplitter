@@ -1,6 +1,7 @@
 const axios = require("axios");
 const async = require("async");
-const path = require("path");
+const moment = require("moment");
+
 const db = require("../db");
 
 class ApiController {
@@ -18,11 +19,14 @@ class ApiController {
   }
 
   startExport() {
-    const dateNow = Date.now();
-    const tillDate = new Date(dateNow).toISOString();
-    const periodInMiliseconds = this.exportPeriodHours * 60 * 60 * 1000;
-    const sinceDate = new Date(Date.now() - periodInMiliseconds).toISOString();
-
+    const tillDate = moment().utc().format("DD.MM.YYYY");
+    const sinceDate = moment()
+      .subtract(this.exportPeriodHours, "hours")
+      .format("DD.MM.YYYY");
+    console.log({
+      sinceDateTimeUtc: `${sinceDate} 23:00:00`,
+      tillDateTimeUtc: `${tillDate} 23:00:00`,
+    });
     return axios({
       url: `https://api.mindbox.ru/v3/operations/sync?endpointId=${this.endpoint}&operation=${this.operation}`,
       method: "post",
@@ -32,8 +36,8 @@ class ApiController {
         Authorization: `Mindbox secretKey="${this.secretKey}"`,
       },
       data: {
-        sinceDateTimeUtc: sinceDate,
-        tillDateTimeUtc: tillDate,
+        sinceDateTimeUtc: `${sinceDate} 23:00:00`,
+        tillDateTimeUtc: `${tillDate} 23:00:00`,
       },
     });
   }
