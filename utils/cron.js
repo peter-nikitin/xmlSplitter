@@ -1,5 +1,4 @@
 const CronController = require("../controllers/CronController");
-const CronModel = require("../models/CronModel");
 
 const db = require("../db/index");
 

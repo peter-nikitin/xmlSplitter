@@ -1,10 +1,11 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+
+const router = express.Router();
 
 const db = require("../db");
 
 /* GET users listing. */
-router.get("/:operation", function (req, res, next) {
+router.get("/:operation", function (req, res) {
   res.json(db.getLogs(req.params.operation));
 });
 

@@ -33,6 +33,8 @@ const apiController = new ApiController(customerSettings, FTP.uploadFile);
 const cron = new CronModel(customerSettings);
 cron.tick();
 
+apiController.startExport();
+
 // const manualDownload = (exportID) => {
 //   apiController.startExport().then((response) => apiController.startCheckingExportTask(
 //     [
