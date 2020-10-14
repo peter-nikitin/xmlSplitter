@@ -1,17 +1,20 @@
 const axios = require("axios");
 const async = require("async");
+const path = require("path");
+const db = require("../db");
 
 class ApiController {
-  constructor({ OPERATION_NAME, OUTPUT_FOLDER_NAME_ON_FTP, EXPORT_PERIOD_HOURS, TAG_NAME }, ftp) {
+  constructor(settings, outputStream) {
     this.endpoint = process.env.ENDPOINT;
     this.secretKey = process.env.SECRET_KEY;
-    this.operation = OPERATION_NAME;
-    this.targetLocalPath = OUTPUT_FOLDER_NAME_ON_FTP;
+    this.operation = settings.OPERATION_NAME;
+    this.targetPath = settings.OUTPUT_FOLDER_NAME_ON_FTP;
     this.taskID = 0;
-    this.exportPeriodHours = EXPORT_PERIOD_HOURS;
+    this.exportPeriodHours = settings.EXPORT_PERIOD_HOURS;
     this.urlsFromExport = [];
-    this.ftp = ftp;
-    this.exportName = TAG_NAME;
+    this.outputStream = outputStream;
+    this.exportName = settings.TAG_NAME;
+    this.settings = settings;
   }
 
   startExport() {
@@ -36,7 +39,10 @@ class ApiController {
   }
 
   startCheckingExportTask(taskID) {
-    console.log(`export ID: ${taskID}`);
+    db.saveLogs(this.settings.NAME, {
+      date: new Date(),
+      data: `Поставлена задача экспорта №: ${taskID}`,
+    });
     this.taskID = taskID;
     const intervalMinuts = 1.0;
     const intervalMiliseconds = intervalMinuts * 60 * 1000;
@@ -44,7 +50,10 @@ class ApiController {
     return new Promise((resolve, reject) => {
       this.interval = setInterval(() => {
         this.checkExportTask(taskID).then((response) => {
-          console.log(`task status: ${response.data.exportResult.processingStatus}`);
+          db.saveLogs(this.settings.NAME, {
+            date: new Date(),
+            data: `Проверяем задачу. Статус: ${response.data.exportResult.processingStatus}`,
+          });
 
           if (response.status !== 200) reject(new Error("Status not 200"));
           if (response.data.exportResult.processingStatus === "Ready") {
@@ -76,11 +85,7 @@ class ApiController {
 
   downloadAllFiles(filesArray, outputStreamHendler) {
     return async.mapSeries(filesArray, (item, collback) =>
-      this.downloadResultFile(
-        item,
-        outputStreamHendler,
-        collback
-      )
+      this.downloadResultFile(item, outputStreamHendler, collback)
     );
   }
 
@@ -90,15 +95,21 @@ class ApiController {
         url,
         method: "get",
         responseType: "stream",
-      }).then((response) => {
-        if (response.status !== 200) reject(new Error("Status no 200"))
-        streamHendler(response.data, (data, chunk) =>
-          this.ftp.uploadFile(
-            data,
-            `/${this.targetLocalPath}/export-${this.exportName}-${this.taskID}-${chunk}.xml`, collback))
       })
-    })
-
+        .then((response) => {
+          if (response.status !== 200) reject(new Error("Status no 200"));
+          streamHendler(
+            response.data,
+            (data, chunk) =>
+              this.outputStream(
+                `/${this.targetPath}/export-${this.exportName}-${this.taskID}-${chunk}.xml`,
+                data
+              ),
+            collback
+          );
+        })
+        .catch((err) => reject(err));
+    });
   }
 }
 
