@@ -1,22 +1,54 @@
 {
   "operations": [
     {
-      "NAME": "customers",
-      "OUTPUT_FOLDER_NAME_ON_FTP": "test-chuncks",
-      "TAG_NAME": "customer",
-      "ITEMS_PER_CHUNCK": 50000,
-      "OPERATION_NAME": "exportSegmentsPart3",
-      "EXPORT_PERIOD_HOURS": 24,
-      "CRON_TIME": "0 30 11 * * *"
+      "taskName": "customers",
+      "outputPath": "test-chuncks",
+      "tagName": "customer",
+      "itemsPerChunk": 50000,
+      "operationName": "exportSegmentsPart3",
+      "exportPeriodHours": 24,
+      "cronTimerString": "0 30 11 * * *"
     },
     {
-      "NAME": "customers-merges",
-      "OUTPUT_FOLDER_NAME_ON_FTP": "test-chuncks",
-      "TAG_NAME": "customerAction",
-      "ITEMS_PER_CHUNCK": 50000,
-      "OPERATION_NAME": "TestExportDeduplications",
-      "EXPORT_PERIOD_HOURS": 24,
-      "CRON_TIME": "0 0 11 * * *"
+      "taskName": "customers-merges",
+      "outputPath": "test-chuncks",
+      "tagName": "customerAction",
+      "itemsPerChunk": 50000,
+      "operationName": "TestExportDeduplications",
+      "exportPeriodHours": 24,
+      "cronTimerString": "0 0 11 * * *"
+    }
+  ],
+  "logs": [
+    {
+      "operation": "customers",
+      "date": "2020-10-19T19:10:17.554Z",
+      "data": "Поставлена регулярная задача. Следующее выполнение "
+    },
+    {
+      "operation": "customers-merges",
+      "date": "2020-10-19T19:10:17.557Z",
+      "data": "Поставлена регулярная задача. Следующее выполнение "
+    },
+    {
+      "operation": "customers",
+      "date": "2020-10-19T19:11:24.707Z",
+      "data": "Поставлена регулярная задача. Следующее выполнение "
+    },
+    {
+      "operation": "customers-merges",
+      "date": "2020-10-19T19:11:24.710Z",
+      "data": "Поставлена регулярная задача. Следующее выполнение "
+    },
+    {
+      "operation": "customers",
+      "date": "2020-10-19T19:14:52.959Z",
+      "data": "Поставлена регулярная задача. Следующее выполнение "
+    },
+    {
+      "operation": "customers-merges",
+      "date": "2020-10-19T19:14:52.962Z",
+      "data": "Поставлена регулярная задача. Следующее выполнение "
     }
   ]
 }
