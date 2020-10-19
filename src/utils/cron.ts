@@ -6,4 +6,6 @@ import { Settings } from "../declare/types.d";
 
 const operations = db.getOperations();
 
-operations.map((item: Settings) => CronController.setCronJob(item));
+export default operations.map((item: Settings) =>
+  CronController.setCronJob(item)
+);
