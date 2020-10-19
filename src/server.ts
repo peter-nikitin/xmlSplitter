@@ -2,9 +2,11 @@ import http from "http";
 
 import app from "./app";
 
-import * as cron from "./utils/cron";
+import "./utils/cron";
 
 const port = process.env.PORT || 8080;
+
+// console.log(cron);
 
 app.set("port", port);
 
