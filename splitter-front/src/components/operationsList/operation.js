@@ -8,13 +8,13 @@ const Operation = ({ data }) => {
   const [ticks, handleTicksChange] = useState([]);
 
   const executeOperation = () => {
-    fetch(`/operation/execute/${data.NAME}`, {
+    fetch(`/operation/execute/${data.taskName}`, {
       method: "post",
     }).then((response) => response.json());
   };
 
   useEffect(() => {
-    fetch(`/operation/${data.NAME}`)
+    fetch(`/operation/${data.taskName}`)
       .then((response) => response.json())
       .then((response) => {
         if (response.status === "found") {
@@ -34,7 +34,7 @@ const Operation = ({ data }) => {
           <Grid.Column width={6}>
             <Card fluid>
               <Card.Content>
-                <Card.Header>{data.NAME} </Card.Header>
+                <Card.Header>{data.taskName} </Card.Header>
 
                 <Card.Meta>
                   {ticks.lastTick && (
@@ -59,7 +59,7 @@ const Operation = ({ data }) => {
                         <List.Header as="p">Целевая папка на ФТП</List.Header>
                         <List.Description as="p">
                           {" "}
-                          {data.OUTPUT_FOLDER_NAME_ON_FTP}
+                          {data.outputPath}
                         </List.Description>
                       </List.Content>
                     </List.Item>
@@ -69,7 +69,7 @@ const Operation = ({ data }) => {
                           Тег, по которому резать
                         </List.Header>
                         <List.Description as="p">
-                          {data.TAG_NAME}
+                          {data.tagName}
                         </List.Description>
                       </List.Content>
                     </List.Item>
@@ -79,7 +79,7 @@ const Operation = ({ data }) => {
                           Целевое количество записей
                         </List.Header>
                         <List.Description as="p">
-                          {data.ITEMS_PER_CHUNCK}
+                          {data.itemsPerChunk}
                         </List.Description>
                       </List.Content>
                     </List.Item>
@@ -87,7 +87,7 @@ const Operation = ({ data }) => {
                       <List.Content>
                         <List.Header as="p">Имя метода экспорта</List.Header>
                         <List.Description as="p">
-                          {data.OPERATION_NAME}
+                          {data.operationName}
                         </List.Description>
                       </List.Content>
                     </List.Item>
@@ -97,7 +97,7 @@ const Operation = ({ data }) => {
                           Период экспорта в часах
                         </List.Header>
                         <List.Description as="p">
-                          {data.EXPORT_PERIOD_HOURS}
+                          {data.exportPeriodHours}
                         </List.Description>
                       </List.Content>
                     </List.Item>
@@ -117,7 +117,7 @@ const Operation = ({ data }) => {
             </Card>
           </Grid.Column>
           <Grid.Column width={10}>
-            <Logs operation={data.NAME} />
+            <Logs operation={data.taskName} />
           </Grid.Column>
         </Grid.Row>
       </Grid>
