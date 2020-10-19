@@ -4,17 +4,31 @@ import moment from "moment";
 
 import db from "../db";
 
+import { Settings } from "../declare/types.d";
+
 class ApiController {
-  constructor(settings, outputStream) {
+  endpoint: string | undefined;
+  secretKey: string | undefined;
+  operation: string;
+  targetPath: string;
+  taskID: number;
+  exportPeriodHours: number;
+  urlsFromExport: string[];
+  outputStream: Function;
+  exportName: string;
+  settings: Settings;
+  interval: NodeJS.Timeout;
+
+  constructor(settings: Settings, outputStream: Function) {
     this.endpoint = process.env.ENDPOINT;
     this.secretKey = process.env.SECRET_KEY;
-    this.operation = settings.OPERATION_NAME;
-    this.targetPath = settings.OUTPUT_FOLDER_NAME_ON_FTP;
+    this.operation = settings.operationName;
+    this.targetPath = settings.outputPath;
     this.taskID = 0;
-    this.exportPeriodHours = settings.EXPORT_PERIOD_HOURS;
+    this.exportPeriodHours = settings.exportPeriodHours;
     this.urlsFromExport = [];
     this.outputStream = outputStream;
-    this.exportName = settings.TAG_NAME;
+    this.exportName = settings.tagName;
     this.settings = settings;
   }
 
@@ -42,8 +56,9 @@ class ApiController {
     });
   }
 
-  startCheckingExportTask(taskID) {
-    db.saveLogs(this.settings.NAME, {
+  startCheckingExportTask(taskID: number) {
+    db.saveLogs(this.settings.operationName, {
+      operation: this.settings.operationName,
       date: new Date(),
       data: `Поставлена задача экспорта №: ${taskID}`,
     });
@@ -54,7 +69,8 @@ class ApiController {
     return new Promise((resolve, reject) => {
       this.interval = setInterval(() => {
         this.checkExportTask(taskID).then((response) => {
-          db.saveLogs(this.settings.NAME, {
+          db.saveLogs(this.settings.operationName, {
+            operation: this.settings.operationName,
             date: new Date(),
             data: `Проверяем задачу. Статус: ${response.data.exportResult.processingStatus}`,
           });
@@ -72,7 +88,7 @@ class ApiController {
     // return Promise.resolve()
   }
 
-  checkExportTask(taskID) {
+  checkExportTask(taskID: number) {
     return axios({
       url: `https://api.mindbox.ru/v3/operations/sync?endpointId=${this.endpoint}&operation=${this.operation}`,
       method: "post",
@@ -87,13 +103,17 @@ class ApiController {
     });
   }
 
-  downloadAllFiles(filesArray, outputStreamHendler) {
+  downloadAllFiles(filesArray: string[], outputStreamHendler: any) {
     return async.mapSeries(filesArray, (item, collback) =>
       this.downloadResultFile(item, outputStreamHendler, collback)
     );
   }
 
-  downloadResultFile(url, streamHendler, collback) {
+  downloadResultFile(
+    url: string,
+    streamHendler: Function,
+    collback: CallableFunction
+  ) {
     return new Promise((resolve, reject) => {
       axios({
         url,
@@ -104,7 +124,7 @@ class ApiController {
           if (response.status !== 200) reject(new Error("Status no 200"));
           streamHendler(
             response.data,
-            (data, chunk) =>
+            (data: any, chunk: string) =>
               this.outputStream(
                 `/${this.targetPath}/export-${this.exportName}-${this.taskID}-${chunk}.xml`,
                 data
