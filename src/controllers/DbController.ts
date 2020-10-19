@@ -5,7 +5,7 @@ import { Settings } from "../declare/types.d";
 
 interface Logs {
   operation: string;
-  date: string;
+  date: Date;
   data: string;
 }
 
