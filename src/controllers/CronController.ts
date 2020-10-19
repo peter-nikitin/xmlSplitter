@@ -18,7 +18,7 @@ class CronController {
     this.tasks.push(newCronJob);
     db.saveLogs(operationSettings.taskName, {
       operation: operationSettings.taskName,
-      date: `${new Date()}`,
+      date: new Date(),
       data: `Поставлена регулярная задача. Следующее выполнение ${moment(
         newCronJob.getNextDate()
       ).format("DD.MM.YYYY hh:mm")}`,
