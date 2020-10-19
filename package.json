@@ -7,7 +7,7 @@
     "test": "jest",
     "build": "tsc",
     "lint": "eslint . & echo 'lint complete'",
-    "dev": "ts-node-dev --respawn --transpileOnly ./src/app.ts",
+    "dev": "ts-node-dev --respawn --transpile-only  ./src/server.ts",
     "prod": "tsc && node ./built/src/app.js",
     "debug": "tsc && node --inspect ./built/src/app.js"
   },
@@ -17,6 +17,7 @@
     "@types/ftp": "^0.3.31",
     "@types/lowdb": "^1.0.9",
     "@types/mocha": "^8.0.3",
+    "@types/node": "^14.11.10",
     "async": "^3.2.0",
     "axios": "^0.20.0",
     "body-parser": "^1.19.0",
@@ -35,6 +36,7 @@
     "xmlsplit": "^1.2.8"
   },
   "devDependencies": {
+    "@types/async": "^3.2.3",
     "@types/http-errors": "^1.8.0",
     "@types/morgan": "^1.9.1",
     "@typescript-eslint/eslint-plugin": "^4.4.1",
@@ -50,6 +52,7 @@
     "jest": "^26.5.3",
     "ts-jest": "^26.4.1",
     "ts-node": "^9.0.0",
-    "ts-node-dev": "^1.0.0"
+    "ts-node-dev": "^1.0.0",
+    "typescript": "^4.0.3"
   }
 }
