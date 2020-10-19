@@ -25,7 +25,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "./splitter-front/build")));
+app.use(express.static(path.join(__dirname, "../splitter-front/build")));
 // app.use(cors());
 // app.set("etag", false);
 
