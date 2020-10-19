@@ -58,18 +58,20 @@ class CronModel {
       )
       .then((urlsArray) =>
         this.apiController.downloadAllFiles(
-          urlsArray,
+          urlsArray as string[],
           this.splitController.splitFile
         )
       )
       .then(() =>
         db.saveLogs(this.settings.taskName, {
+          operation: this.settings.taskName,
           date: new Date(),
           data: `✅ Успешно завершено. Экспортировано, поделено, загружено на ФТП`,
         })
       )
       .catch((err) =>
         db.saveLogs(this.settings.taskName, {
+          operation: this.settings.taskName,
           date: new Date(),
           data: `❌ Ошибка: ${err}`,
         })
