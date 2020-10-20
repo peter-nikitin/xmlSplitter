@@ -57,8 +57,8 @@ class ApiController {
   }
 
   startCheckingExportTask(taskID: number) {
-    db.saveLogs(this.settings.operationName, {
-      operation: this.settings.operationName,
+    db.saveLogs(this.settings.taskName, {
+      operation: this.settings.taskName,
       date: new Date(),
       data: `Поставлена задача экспорта №: ${taskID}`,
     });
@@ -69,8 +69,8 @@ class ApiController {
     return new Promise((resolve, reject) => {
       this.interval = setInterval(() => {
         this.checkExportTask(taskID).then((response) => {
-          db.saveLogs(this.settings.operationName, {
-            operation: this.settings.operationName,
+          db.saveLogs(this.settings.taskName, {
+            operation: this.settings.taskName,
             date: new Date(),
             data: `Проверяем задачу. Статус: ${response.data.exportResult.processingStatus}`,
           });
