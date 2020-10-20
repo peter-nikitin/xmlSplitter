@@ -59,7 +59,7 @@ class SplitController {
         })
         .on("end", () => {
           db.saveLogs(this.settings.operationName, {
-            operation: this.settings.operationName,
+            operation: this.settings.taskName,
             date: new Date(),
             data: `✂️  Поделили файлик на ${this.chunckNumber} кусков. `,
           });
