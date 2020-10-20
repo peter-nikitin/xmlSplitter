@@ -41,7 +41,6 @@ class FtpController {
       host: this.host,
       user: this.user,
       password: this.password,
-      port: 33,
     });
   }
 
