@@ -49,7 +49,11 @@ class DbController {
   }
 
   getLogs(operation: string) {
-    return this.db.get(operation).value();
+    return this.db
+      .get("logs")
+      .value()
+      .filter((item) => item.operation === operation)
+      .reverse();
   }
 
   saveOperation(operation: Settings) {
