@@ -19,7 +19,9 @@ class CronController {
     db.saveLogs(operationSettings.taskName, {
       operation: operationSettings.taskName,
       date: new Date(),
-      data: `Поставлена регулярная задача. Следующее выполнение `,
+      data: `Поставлена регулярная задача. Следующее выполнение ${newCronJob
+        .getNextDate()
+        .format("DD.MM.YYYY HH:mm")}`,
     });
   }
 
@@ -37,4 +39,4 @@ class CronController {
   }
 }
 
-export default CronController;
+export default new CronController();
