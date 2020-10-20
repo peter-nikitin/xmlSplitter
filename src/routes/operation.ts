@@ -11,7 +11,11 @@ operationRouter.get("/", (req, res) => {
 });
 
 operationRouter.get("/:operation", (req, res) => {
-  res.json(CronController.getCronJob(req.params.operation));
+  res.json(
+    CronController.tasks.filter(
+      (task) => task.settings.operationName === req.params.operation
+    )
+  );
 });
 
 operationRouter.post("/", (req, res) => {
