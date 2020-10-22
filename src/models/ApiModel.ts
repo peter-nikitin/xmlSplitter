@@ -1,12 +1,17 @@
-import axios, { AxiosInstance } from "axios";
-import moment from "moment";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 import { Settings } from "../declare/types.d";
+
+type ExportStarted = {
+  status: "Success";
+  exportId: string;
+};
 
 class ApiModel {
   private endpoint: string | undefined = process.env.ENDPOINT;
   private secretKey: string | undefined = process.env.SECRET_KEY;
   private settings: Settings;
+  url: string;
   axios: AxiosInstance;
 
   constructor(settings: Settings) {
@@ -22,23 +27,17 @@ class ApiModel {
     });
   }
 
-  startExport(sinceDateTimeUtc?: string, tillDateTimeUtc?: string) {
-    // используем переданные значения или считаем сами
-    const tillDate =
-      tillDateTimeUtc || `${moment().utc().format("DD.MM.YYYY")} 23:00:00`;
-    const sinceDate =
-      sinceDateTimeUtc ||
-      `${moment()
-        .subtract(this.settings.exportPeriodHours, "hours")
-        .format("DD.MM.YYYY")} 23:00:00`;
-
+  startExport(
+    sinceDateTimeUtc: string,
+    tillDateTimeUtc: string
+  ): Promise<AxiosResponse<ExportStarted>> {
     return this.axios.post("", {
-      sinceDateTimeUtc: sinceDate,
-      tillDateTimeUtc: tillDate,
+      sinceDateTimeUtc: sinceDateTimeUtc,
+      tillDateTimeUtc: tillDateTimeUtc,
     });
   }
 
-  checkExportResult(taskID: number) {
+  checkExportResult(taskID: string) {
     return this.axios.post("", {
       exportId: taskID,
     });
