@@ -1,7 +1,7 @@
 import low, { lowdb } from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 
-import { Settings } from "../declare/types.d";
+import { Settings } from "../declare/types";
 
 interface Logs {
   operation: string;
