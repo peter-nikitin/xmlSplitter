@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from "axios";
+import axiosRetry from "axios-retry";
 
 import { Settings } from "../declare/types.d";
 
@@ -25,6 +26,7 @@ class ApiModel {
         Authorization: `Mindbox secretKey="${this.secretKey}"`,
       },
     });
+    axiosRetry(this.axios, { retries: 5 });
   }
 
   startExport(
