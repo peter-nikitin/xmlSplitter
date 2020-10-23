@@ -17,31 +17,16 @@ const settings = {
   cronTimerString: "0 03 19 * * *",
 };
 
+const mockRequestBody = {
+  sinceDateTimeUtc: `20.10.2020 23:00:00`,
+  tillDateTimeUtc: `21.10.2020 23:00:00`,
+};
+
 describe("startExport", () => {
-  it("should be with default params", () => {
-    const Api = new ApiModel(settings);
-
-    Api.axios.post = jest.fn();
-
-    Api.startExport();
-
-    expect(Api.axios.post).toHaveBeenCalledWith("", {
-      sinceDateTimeUtc: `${moment()
-        .subtract(settings.exportPeriodHours, "hours")
-        .format("DD.MM.YYYY")} 23:00:00`,
-      tillDateTimeUtc: `${moment().utc().format("DD.MM.YYYY")} 23:00:00`,
-    });
-  });
-
   it("should be with passed params", () => {
     const Api = new ApiModel(settings);
 
     Api.axios.post = jest.fn();
-
-    const mockRequestBody = {
-      sinceDateTimeUtc: `20.10.2020 23:00:00`,
-      tillDateTimeUtc: `21.10.2020 23:00:00`,
-    };
 
     Api.startExport(
       mockRequestBody.sinceDateTimeUtc,
@@ -63,7 +48,10 @@ describe("startExport", () => {
     };
     api.axios.post = jest.fn().mockResolvedValue(apiAnswerMock);
 
-    const apiAnswer = await api.startExport();
+    const apiAnswer = await api.startExport(
+      mockRequestBody.sinceDateTimeUtc,
+      mockRequestBody.tillDateTimeUtc
+    );
 
     expect(apiAnswer).toEqual(apiAnswerMock);
   });
@@ -84,7 +72,7 @@ describe("checkExportResult", () => {
     };
     api.axios.post = jest.fn().mockResolvedValue(apiAnswerMock);
 
-    const apiAnswer = await api.checkExportResult(123);
+    const apiAnswer = await api.checkExportResult("123");
 
     expect(apiAnswer).toEqual(apiAnswerMock);
   });
