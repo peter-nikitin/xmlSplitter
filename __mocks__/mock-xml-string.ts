@@ -53,6 +53,4 @@ export const mocksXmlString = `<result>
       <timeZoneSource>Определили по мобильному телефону</timeZoneSource>
       <isEmailConfirmed>true</isEmailConfirmed>
       <isMobilePhoneConfirmed>false</isMobilePhoneConfirmed>
-    </customer>
-  </customers>
-</result>`;
+    </customer></customers></result>`;
