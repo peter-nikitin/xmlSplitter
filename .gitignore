@@ -120,3 +120,4 @@ dist
 /splitter-front/build
 
 .history
+/test_tmp
