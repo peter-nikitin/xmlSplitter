@@ -7,21 +7,15 @@ const FTP_STATUSES = {
   NOT_CONNECTED: "NOT_CONNECTED,",
 };
 
-class FtpController {
-  private settings: Settings;
-  private host: string | undefined;
-  private user: string | undefined;
-  private password: string | undefined;
-  ftpClient: Client;
-  ftpStatus: string;
+class FtpModel {
+  private host: string | undefined = process.env.FTP_HOST;
+  private user: string | undefined = process.env.FTP_USER;
+  private password: string | undefined = process.env.FTP_PASS;
+  private port: number = +(process.env.FTP_PORT || 21);
+  ftpClient: Client = new Client();
+  ftpStatus: string = FTP_STATUSES.NOT_CONNECTED;
 
-  constructor(settings: Settings) {
-    this.settings = settings;
-    this.host = process.env.FTP_HOST;
-    this.user = process.env.FTP_USER;
-    this.password = process.env.FTP_PASS;
-    this.ftpClient = new Client();
-    this.ftpStatus = FTP_STATUSES.NOT_CONNECTED;
+  constructor() {
     this.uploadFile = this.uploadFile.bind(this);
   }
 
@@ -40,6 +34,7 @@ class FtpController {
         host: this.host,
         user: this.user,
         password: this.password,
+        port: this.port,
       });
     });
   }
@@ -68,6 +63,17 @@ class FtpController {
       });
     });
   }
+
+  listDir(path: string): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      this.ftpClient.list(path, (err, listing) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(listing.map((file) => file.name) as string[]);
+      });
+    });
+  }
 }
 
-export default FtpController;
+export default FtpModel;
