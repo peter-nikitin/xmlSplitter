@@ -12,7 +12,7 @@ describe("FtpModel", () => {
   const logger = bunyan.createLogger({ name: "test-ftp" });
   const clientDirectory = `${process.cwd()}/test_tmp`;
 
-  const isTestDirAppear = (path: string) => {
+  const checkTestDir = (path: string) => {
     if (!fs.existsSync(path)) {
       fs.mkdir(path, (err) => {
         throw err;
@@ -20,7 +20,7 @@ describe("FtpModel", () => {
     }
   };
 
-  isTestDirAppear(clientDirectory);
+  checkTestDir(clientDirectory);
 
   let connection;
   const sandbox = sinon.createSandbox();
