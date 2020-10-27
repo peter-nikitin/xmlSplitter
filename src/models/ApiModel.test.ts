@@ -2,10 +2,13 @@ import fs from "fs";
 import MemoryStream from "memorystream";
 import moment from "moment";
 import path from "path";
+import axios from "axios";
 
 import ApiModel from "./ApiModel";
 
 import { mocksXmlString } from "../../__mocks__/mock-xml-string";
+
+jest.mock("axios");
 
 const settings = {
   taskName: "customers-test",
@@ -26,14 +29,14 @@ describe("startExport", () => {
   it("should be with passed params", () => {
     const Api = new ApiModel(settings);
 
-    Api.axios.post = jest.fn();
+    axios.post = jest.fn();
 
     Api.startExport(
       mockRequestBody.sinceDateTimeUtc,
       mockRequestBody.tillDateTimeUtc
     );
 
-    expect(Api.axios.post).toHaveBeenCalledWith("", mockRequestBody);
+    expect(axios.post).toHaveBeenCalledWith(mockRequestBody);
   });
 
   it("should return value", async () => {
@@ -46,7 +49,7 @@ describe("startExport", () => {
         exportId: "123",
       },
     };
-    api.axios.post = jest.fn().mockResolvedValue(apiAnswerMock);
+    axios.post = jest.fn().mockResolvedValue(apiAnswerMock);
 
     const apiAnswer = await api.startExport(
       mockRequestBody.sinceDateTimeUtc,
@@ -70,7 +73,7 @@ describe("checkExportResult", () => {
         },
       },
     };
-    api.axios.post = jest.fn().mockResolvedValue(apiAnswerMock);
+    axios.post = jest.fn().mockResolvedValue(apiAnswerMock);
 
     const apiAnswer = await api.checkExportResult("123");
 
@@ -92,7 +95,7 @@ describe("downloadResultFile", () => {
       status: 200,
       data: mockReadbleStream,
     };
-    api.axios.get = jest.fn().mockResolvedValue(apiAnswerMock);
+    axios.get = jest.fn().mockResolvedValue(apiAnswerMock);
 
     api
       .downloadResultFile("")

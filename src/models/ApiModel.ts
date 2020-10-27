@@ -17,37 +17,49 @@ class ApiModel {
 
   constructor(settings: Settings) {
     this.settings = settings;
-    this.axios = axios.create({
-      url: `https://api.mindbox.ru/v3/operations/sync?endpointId=${this.endpoint}&operation=${this.settings.operationName}`,
-      timeout: 60000,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Mindbox secretKey="${this.secretKey}"`,
-      },
-    });
-    axiosRetry(this.axios, { retries: 5 });
+    axiosRetry(axios, { retries: 5 });
   }
 
   startExport(
     sinceDateTimeUtc: string,
     tillDateTimeUtc: string
   ): Promise<AxiosResponse<ExportStarted>> {
-    return this.axios.post("", {
-      sinceDateTimeUtc: sinceDateTimeUtc,
-      tillDateTimeUtc: tillDateTimeUtc,
-    });
+    return axios.post(
+      `https://api.mindbox.ru/v3/operations/sync?endpointId=${this.endpoint}&operation=${this.settings.operationName}`,
+      {
+        sinceDateTimeUtc: sinceDateTimeUtc,
+        tillDateTimeUtc: tillDateTimeUtc,
+      },
+      {
+        timeout: 60000,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Mindbox secretKey="${this.secretKey}"`,
+        },
+      }
+    );
   }
 
   checkExportResult(taskID: string) {
-    return this.axios.post("", {
-      exportId: taskID,
-    });
+    return axios.post(
+      `https://api.mindbox.ru/v3/operations/sync?endpointId=${this.endpoint}&operation=${this.settings.operationName}`,
+      {
+        exportId: taskID,
+      },
+      {
+        timeout: 60000,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Mindbox secretKey="${this.secretKey}"`,
+        },
+      }
+    );
   }
 
   downloadResultFile(url: string) {
-    return this.axios.get(url, {
-      headers: {},
+    return axios.get(url, {
       responseType: "stream",
     });
   }
