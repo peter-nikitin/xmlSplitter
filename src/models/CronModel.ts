@@ -1,30 +1,22 @@
 import { CronJob } from "cron";
-import FtpController from "./FtpModel";
-import ApiController from "../controllers/ApiController";
-import SplitController from "../controllers/splitController";
-import db from "../db";
+import moment from "moment";
 
 import { Settings } from "../declare/types.d";
 
 class CronModel {
   settings: Settings;
-  onComplete: null = null;
-  start: boolean = true;
-  timeZone: string = "Europe/Moscow";
-  context: null = null;
-  runOnInit: boolean = false;
-  FTP: FtpController;
-  splitController: SplitController;
-  apiController: ApiController;
+  private onComplete: null = null;
+  private start: boolean = true;
+  private timeZone: string = "Europe/Moscow";
+  private context: null = null;
+  private runOnInit: boolean = false;
   job: CronJob;
-  tick: () => void;
 
   constructor(settings: Settings, tickFunction: () => void) {
     this.settings = settings;
-    this.tick = tickFunction;
     this.job = new CronJob(
       this.settings.cronTimerString,
-      this.tick,
+      tickFunction,
       this.onComplete,
       this.start,
       this.timeZone,
@@ -34,11 +26,11 @@ class CronModel {
   }
 
   getNextDate() {
-    return this.job.nextDates();
+    return this.job.nextDates().format("DD.MM hh:mm");
   }
 
   getLastDate() {
-    return this.job.lastDate();
+    return moment(this.job.lastDate()).format("DD.MM hh:mm");
   }
 }
 
