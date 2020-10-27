@@ -4,69 +4,63 @@ import FileSync from "lowdb/adapters/FileSync";
 import { Settings } from "../declare/types";
 
 interface Logs {
-  operation: string;
-  date: Date;
-  data: string;
+  task: string;
+  dataTime: Date;
+  logString: string;
 }
 
-interface LowDBSchema {
-  operations: Settings[];
+interface DBSchema {
+  tasks: Settings[];
   logs: Logs[];
 }
 
-class DbController {
-  adapter: typeof FileSync;
-  db: low.LowdbSync<LowDBSchema>;
-  file: string;
+class DbModel {
+  private adapter: typeof FileSync;
+  db: low.LowdbSync<DBSchema>;
 
   constructor(file: string) {
-    this.file = file;
     this.adapter = new FileSync(file);
     this.db = low(this.adapter);
-    this.init();
   }
 
-  init() {
-    this.db.defaults().write();
+  default(value: DBSchema) {
+    this.db.defaults(value).write();
   }
 
-  getOperations() {
-    return this.db.get("operations").value();
+  getAllTasks() {
+    return this.db.get("tasks").value();
   }
 
-  updateOperation(operation: Settings) {
+  updateTask(task: Settings) {
     this.db
-      .get("operations")
-      .find({ operationName: operation.operationName })
-      .assign({ operation })
+      .get("tasks")
+      .find({ taskName: task.taskName })
+      .assign({ ...task })
       .write();
   }
 
-  removeOperation(operation: string) {
-    this.db.get("operations").remove({ operationName: operation }).write();
-
-    this.db.unset(operation).write();
+  removeTask(task: string) {
+    this.db.get("tasks").remove({ taskName: task }).write();
   }
 
-  getLogs(operation: string) {
+  addTask(task: Settings) {
+    this.db.get("tasks").push(task).write();
+  }
+
+  getLogs(task: string) {
     return this.db
       .get("logs")
       .value()
-      .filter((item) => item.operation === operation)
+      .filter((item) => item.task === task)
       .reverse();
   }
 
-  saveOperation(operation: Settings) {
-    this.db.get("operations").push(operation).write();
-    this.db.set(operation.operationName, []).write();
-  }
-
-  saveLogs(logOperationName: string, log: Logs) {
+  saveLog(task: string, log: string) {
     this.db
       .get("logs")
-      .push({ ...log, operation: logOperationName })
+      .push({ logString: log, dataTime: new Date(), task: task })
       .write();
   }
 }
 
-export default DbController;
+export default DbModel;
