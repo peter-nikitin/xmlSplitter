@@ -66,8 +66,7 @@ describe("splitFile", () => {
 
     const resultedFile = await splitter.splitFile(
       mockReadableStream,
-      mockOutput,
-      mockCallback
+      mockOutput
     );
 
     expect(resultData.length).toBe(5);
@@ -85,8 +84,7 @@ describe("splitFile", () => {
     };
     const resultedFile = await splitter.splitFile(
       mockReadableStream,
-      mockOutput,
-      mockCallback
+      mockOutput
     );
 
     expect(resultData).toBe(mocksXmlString);
