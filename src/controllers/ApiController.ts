@@ -4,14 +4,9 @@ import moment, { Moment } from "moment";
 
 import db from "../db";
 
-import { Settings } from "../declare/types.d";
+import { Settings, ExportRange } from "../declare/types.d";
 
 import ApiModel from "../models/ApiModel";
-
-type exportRange = {
-  sinceDateTimeUtc: Moment;
-  tillDateTimeUtc: Moment;
-};
 
 type exportedFilesArray = string[];
 
@@ -25,21 +20,17 @@ class ApiController {
     this.api = new ApiModel(this.settings);
   }
 
-  async exportData(exportRange?: exportRange) {
+  async exportData(exportRange?: ExportRange) {
     let sinceDateTimeUtc: string, tillDateTimeUtc: string;
-    if (exportRange) {
-      sinceDateTimeUtc = exportRange.sinceDateTimeUtc.format(
-        "DD.MM.YYYY hh:MM:ss"
-      );
-      tillDateTimeUtc = exportRange.tillDateTimeUtc.format(
-        "DD.MM.YYYY hh:MM:ss"
-      );
-    } else {
-      sinceDateTimeUtc = `${moment()
-        .subtract(this.settings.exportPeriodHours, "hours")
-        .format("DD.MM.YYYY")} 23:00:00`;
-      tillDateTimeUtc = `${moment().utc().format("DD.MM.YYYY")} 23:00:00`;
-    }
+    sinceDateTimeUtc = exportRange?.sinceDateTimeUtc
+      ? exportRange.sinceDateTimeUtc.format("DD.MM.YYYY hh:MM:ss")
+      : `${moment()
+          .subtract(this.settings.exportPeriodHours, "hours")
+          .format("DD.MM.YYYY")} 23:00:00`;
+
+    tillDateTimeUtc = exportRange?.tillDateTimeUtc
+      ? exportRange.tillDateTimeUtc.format("DD.MM.YYYY hh:MM:ss")
+      : `${moment().utc().format("DD.MM.YYYY")} 23:00:00`;
 
     const exportId = await this.api.startExport(
       sinceDateTimeUtc,
@@ -83,6 +74,15 @@ class ApiController {
       this.interval = setInterval(() => {
         this.checkExport(exportId, resolve, reject);
       }, intervalMilliseconds);
+    });
+  }
+
+  downloadFiles(files: string[], output: (data: any) => void) {
+    return async.forEachLimit(files, 1, (data, next) => {
+      this.api
+        .downloadResultFile(data)
+        .then(output)
+        .then(() => next());
     });
   }
 }

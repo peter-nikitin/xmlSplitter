@@ -11,3 +11,8 @@ export type Settings = {
 };
 
 export type LogsModel = DbController;
+
+export type ExportRange = {
+  sinceDateTimeUtc: Moment;
+  tillDateTimeUtc: Moment;
+};

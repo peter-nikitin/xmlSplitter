@@ -1,6 +1,8 @@
 import ApiController from "./ApiController";
 import moment from "moment";
-import mockAxios from "axios";
+import axios from "axios";
+
+jest.mock("axios");
 
 const settings = {
   taskName: "customers-test",
@@ -53,10 +55,10 @@ describe("checkExport", () => {
     const resolve = jest.fn();
     const reject = jest.fn();
 
-    api.api.axios.post = jest.fn().mockResolvedValueOnce(mockAnswerNotReady);
+    axios.post = jest.fn().mockResolvedValueOnce(mockAnswerNotReady);
 
     api.checkExport("123", resolve, reject);
-    expect(api.api.axios.post).toHaveBeenCalledTimes(1);
+    expect(axios.post).toHaveBeenCalledTimes(1);
   });
 
   it("should return string array", async () => {
@@ -65,7 +67,7 @@ describe("checkExport", () => {
     const resolve = jest.fn();
     const reject = jest.fn();
 
-    api.api.axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
+    axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
 
     await api.checkExport("123", resolve, reject);
     expect(resolve).toHaveBeenCalledWith(mockAnswerReady.data.file.urls);
@@ -77,7 +79,7 @@ describe("checkExport", () => {
     const resolve = jest.fn();
     const reject = jest.fn();
 
-    api.api.axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
+    axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
 
     await api.checkExport("123", resolve, reject);
     expect(resolve).toHaveBeenCalledWith(mockAnswerReady.data.file.urls);
@@ -89,7 +91,7 @@ describe("regularCheckingExportStatus", () => {
     const api = new ApiController(settings);
     jest.setTimeout(30000);
 
-    api.api.axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
+    axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
     const result = await api.regularCheckingExportStatus("123");
 
     expect(result).toEqual(mockAnswerReady.data.file.urls);
@@ -99,13 +101,13 @@ describe("regularCheckingExportStatus", () => {
     const api = new ApiController(settings);
     jest.setTimeout(30000);
 
-    api.api.axios.post = jest
+    axios.post = jest
       .fn()
       .mockResolvedValueOnce(mockAnswerNotReady)
       .mockResolvedValueOnce(mockAnswerReady);
     const result = await api.regularCheckingExportStatus("123");
 
-    expect(api.api.axios.post).toHaveBeenCalledTimes(2);
+    expect(axios.post).toHaveBeenCalledTimes(2);
     expect(result).toEqual(mockAnswerReady.data.file.urls);
   });
 });
@@ -116,7 +118,7 @@ describe("exportData", () => {
 
     api.api.startExport = jest.fn().mockResolvedValueOnce(mockExportTaskId);
 
-    api.api.axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
+    axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
 
     await api.exportData(range);
 
@@ -131,7 +133,7 @@ describe("exportData", () => {
 
     api.api.startExport = jest.fn().mockResolvedValueOnce(mockExportTaskId);
 
-    api.api.axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
+    axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
 
     await api.exportData();
 
@@ -144,7 +146,7 @@ describe("exportData", () => {
   it("should return files array", async () => {
     const api = new ApiController(settings);
 
-    api.api.axios.post = jest
+    axios.post = jest
       .fn()
       .mockResolvedValueOnce(mockExportTaskId)
       .mockResolvedValueOnce(mockAnswerReady);
@@ -152,5 +154,20 @@ describe("exportData", () => {
     const result = await api.exportData();
 
     expect(result).toEqual(mockAnswerReady.data.file.urls);
+  });
+});
+
+describe("downloadFiles", () => {
+  it("should run times 2 times", async () => {
+    jest.setTimeout(30000);
+    const api = new ApiController(settings);
+
+    const files = ["file1", "file2"];
+    api.api.downloadResultFile = jest.fn().mockResolvedValue(true);
+    const output = jest.fn().mockResolvedValue(true);
+
+    await api.downloadFiles(files, output);
+
+    expect(output).toHaveBeenCalledTimes(2);
   });
 });
