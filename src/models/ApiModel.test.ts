@@ -26,22 +26,22 @@ const mockRequestBody = {
 };
 
 describe("startExport", () => {
-  it("should be with passed params", () => {
-    const Api = new ApiModel(settings);
+  // it("should be with passed params", () => {
+  //   const Api = new ApiModel(settings);
 
-    axios.post = jest.fn();
+  //   axios.post = jest.fn();
 
-    Api.startExport(
-      mockRequestBody.sinceDateTimeUtc,
-      mockRequestBody.tillDateTimeUtc
-    );
+  //   Api.startExport(
+  //     mockRequestBody.sinceDateTimeUtc,
+  //     mockRequestBody.tillDateTimeUtc
+  //   );
 
-    const expected = `https://api.mindbox.ru/v3/operations/sync?endpointId=undefined&operation=TestovyjEksportKlientov", ${mockRequestBody}, {"headers": {"Accept": "application/json", "Authorization": "Mindbox secretKey=\"undefined\"", "Content-Type": "application/json"}, "timeout": 60000}`;
+  //   const expected = `https://api.mindbox.ru/v3/operations/sync?endpointId=undefined&operation=TestovyjEksportKlientov", ${mockRequestBody}, {"headers": {"Accept": "application/json", "Authorization": "Mindbox secretKey=\"undefined\"", "Content-Type": "application/json"}, "timeout": 60000}`;
 
-    // expect(axios.post).toHaveBeenCalledWith(expected);
+  // expect(axios.post).toHaveBeenCalledWith(expected);
 
-    // TODO: придумать как протестить то вызов запроса
-  });
+  // TODO: придумать как протестить то вызов запроса
+  // });
 
   it("should return value", async () => {
     const api = new ApiModel(settings);
