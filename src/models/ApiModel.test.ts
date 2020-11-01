@@ -60,7 +60,7 @@ describe("startExport", () => {
       mockRequestBody.tillDateTimeUtc
     );
 
-    expect(apiAnswer).toEqual(apiAnswerMock);
+    expect(apiAnswer).toEqual(apiAnswerMock.data);
   });
 });
 
@@ -81,7 +81,7 @@ describe("checkExportResult", () => {
 
     const apiAnswer = await api.checkExportResult("123");
 
-    expect(apiAnswer).toEqual(apiAnswerMock);
+    expect(apiAnswer).toEqual(apiAnswerMock.data);
   });
 });
 
