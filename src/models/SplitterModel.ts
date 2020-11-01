@@ -27,7 +27,10 @@ class SplitterModel {
     return updatedData;
   }
 
-  splitFile(inputStream: NodeJS.ReadableStream, outputStream: Function) {
+  splitFile(
+    inputStream: NodeJS.ReadableStream,
+    outputStream: (data: any, chunkNumber: number) => void
+  ) {
     this.chunkNumber = 0;
 
     const xmlsplit = new XmlSplit(
