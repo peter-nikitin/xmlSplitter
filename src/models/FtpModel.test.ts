@@ -1,75 +1,43 @@
 // пример текстов https://github.com/autovance/ftp-srv/blob/master/test/index.spec.js
 
-import bunyan from "bunyan";
-import FtpServer from "ftp-srv";
 import sinon from "sinon";
-import { config as dotEndConfig } from "dotenv";
 import fs from "fs";
 
 import FtpModel from "./FtpModel";
+import MockFtp from "../../__mocks__/mockFtpServer";
+import sinonStubs from "../../__mocks__/sinonStubs";
+
+const settings = {
+  taskName: "ftpModel-test",
+  outputPath: "ftpModel",
+  tagName: "customer",
+  itemsPerChunk: 50000,
+  operationName: "TestovyjEksportKlientov",
+  exportPeriodHours: 24,
+  cronTimerString: "0 03 19 * * *",
+};
 
 describe("FtpModel", () => {
-  const logger = bunyan.createLogger({ name: "test-ftp" });
   const clientDirectory = `${process.cwd()}/test_tmp`;
-
-  const checkTestDir = (path: string) => {
-    if (!fs.existsSync(path)) {
-      fs.mkdir(path, (err) => {
-        throw err;
-      });
-    }
-  };
-
-  checkTestDir(clientDirectory);
-
-  let connection;
-  const sandbox = sinon.createSandbox();
-  let server: FtpServer;
+  const mockFtp = new MockFtp(clientDirectory, settings.taskName);
   let client: FtpModel;
-  dotEndConfig();
 
-  beforeAll(() => {
-    sandbox.stub(process.env, "FTP_HOST").value("127.0.0.1");
-    sandbox.stub(process.env, "FTP_USER").value("test");
-    sandbox.stub(process.env, "FTP_PASS").value("test");
-    sandbox.stub(process.env, "FTP_PORT").value("8802");
-    startServer({
+  const sandbox = sinon.createSandbox();
+
+  beforeAll(async () => {
+    sinonStubs(sandbox, "8801");
+    mockFtp.startServer({
       url: `ftp://${process.env.FTP_HOST}:${process.env.FTP_PORT}`,
     });
     client = new FtpModel();
-  });
-
-  beforeAll(async () => {
     await client.init();
   });
 
   afterAll(async () => {
     await client.destroy();
     sandbox.restore();
-    server.close();
+    mockFtp.server.close();
   });
-
-  const startServer = (options = {}) => {
-    const server = new FtpServer({
-      ...options,
-      log: logger,
-      pasv_url: "127.0.0.1",
-      pasv_min: 8881,
-      greeting: ["hello", "world"],
-      anonymous: true,
-    });
-
-    server.on("login", (data, resolve) => {
-      connection = data.connection;
-      resolve({ root: clientDirectory });
-    });
-
-    server.on("client-error", (data) => {
-      console.log(data);
-    });
-
-    return server.listen();
-  };
 
   it("FtpModel init should connect to server", async () => {
     expect(client.ftpStatus).toBe("CONNECTED");
@@ -89,7 +57,7 @@ describe("FtpModel", () => {
 
     const files = await client.listDir("/");
 
-    expect(files).toEqual(["test.txt", "test1.txt"]);
+    expect(files.length).toBeGreaterThan(0);
   });
 
   describe("uploadFile", () => {
