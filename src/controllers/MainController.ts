@@ -19,12 +19,12 @@ class MainController {
     try {
       const status = await this.ftp.init();
       const files = await this.api.exportData(range);
-      this.api.downloadFiles(files, (responce: any) =>
+      this.api.downloadFiles(files, (response: any) =>
         this.splitter.splitFile(
-          responce.data,
-          (data: any, chunckNumber: number) =>
+          response.data,
+          (data: any, chunkNumber: number) =>
             this.ftp.uploadFile(
-              `/${this.settings.outputPath}/${this.settings.taskName}-${chunckNumber}`,
+              `/${this.settings.outputPath}/${this.settings.taskName}-${chunkNumber}`,
               data
             )
         )
