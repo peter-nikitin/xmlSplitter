@@ -57,7 +57,7 @@ class DbController {
   }
 
   getLogs(operation) {
-    return this.db.get(operation).value();
+    return this.db.get(operation).reverse().value();
   }
 
   saveOperation(operation) {
