@@ -28,7 +28,7 @@ const Logs = ({ operation }) => {
           <Image src="https://react.semantic-ui.com/images/wireframe/paragraph.png" />
         </Segment>
       ) : (
-        <Message header="История выполнения">
+        <Message header="История выполнения" className="logs">
           <Grid>
             <Grid.Row>
               <Grid.Column width={14}>
