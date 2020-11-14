@@ -20,7 +20,7 @@ class MainController {
       this.ftp.uploadFile(
         `/${this.settings.outputPath}/${
           this.settings.taskName
-        }-${chunkNumber}-${(Math.random() * 1000).toFixed()}`,
+        }-${chunkNumber}-${(Math.random() * 1000).toFixed()}.xml`,
         data
       );
 
