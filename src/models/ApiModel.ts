@@ -61,7 +61,7 @@ class ApiModel {
     const response = await axios.get(url, {
       responseType: "stream",
     });
-    return response;
+    return response.data;
   }
 }
 
