@@ -39,31 +39,36 @@ describe("FtpModel", () => {
     mockFtp.server.close();
   });
 
-  it("FtpModel init should connect to server", async () => {
-    expect(client.ftpStatus).toBe("CONNECTED");
+  describe("init", () => {
+    it("should connect to server", async () => {
+      expect(client.ftpStatus).toBe("CONNECTED");
+    });
   });
 
-  it("listDir should list files", async () => {
-    fs.writeFile(`${clientDirectory}/test.txt`, "test string", (err) => {
-      if (err) {
-        throw err;
-      }
-    });
-    fs.writeFile(`${clientDirectory}/test1.txt`, "test string", (err) => {
-      if (err) {
-        throw err;
-      }
-    });
-
-    const files = await client.listDir("/");
-
-    expect(files.length).toBeGreaterThan(0);
-  });
-
-  describe("uploadFile", () => {
+  describe("Working with files ", () => {
     afterEach(() => {
-      fs.unlinkSync(`${clientDirectory}/uploadedFile.txt`);
+      if (fs.existsSync(`${clientDirectory}/uploadedFile.txt`)) {
+        fs.unlinkSync(`${clientDirectory}/uploadedFile.txt`);
+      }
     });
+
+    it("should return list of files", async () => {
+      fs.writeFile(`${clientDirectory}/test.txt`, "test string", (err) => {
+        if (err) {
+          throw err;
+        }
+      });
+      fs.writeFile(`${clientDirectory}/test1.txt`, "test string", (err) => {
+        if (err) {
+          throw err;
+        }
+      });
+
+      const files = await client.listDir("/");
+
+      expect(files.length).toBeGreaterThan(0);
+    });
+
     it("should upload the file", async () => {
       await client.uploadFile("/uploadedFile.txt", "test strings");
       const fileOnFtp = await client.listDir("/");
@@ -71,6 +76,21 @@ describe("FtpModel", () => {
       expect(
         fileOnFtp.filter((file) => file === "uploadedFile.txt").length
       ).toBe(1);
+    });
+  });
+
+  describe("Rejections", () => {
+    jest.setTimeout(30000);
+    it("should throw error when ftp is turned-off", async () => {
+      mockFtp.server.close();
+      await client.destroy();
+      try {
+        await client.init();
+      } catch (error) {
+        expect(error.toString()).toBe(
+          "Error: connect ECONNREFUSED 127.0.0.1:8801"
+        );
+      }
     });
   });
 });
