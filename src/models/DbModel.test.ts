@@ -39,14 +39,14 @@ describe("DbModel init", () => {
   });
 });
 
-describe("DbModel operations ", () => {
-  it("should write operation settings", () => {
+describe("Tasks ", () => {
+  it("should write new task", () => {
     DB.addTask({ ...settings });
 
     expect(DB.db.get("tasks").value()[0]).toStrictEqual(settings);
   });
 
-  it("should write operation settings", () => {
+  it("should update task", () => {
     DB.addTask(settings);
 
     const settingsNew = {
@@ -64,11 +64,18 @@ describe("DbModel operations ", () => {
     expect(DB.db.get("tasks").value()[0].outputPath).toBe("test1");
   });
 
-  it("should write operation settings", () => {
+  it("should delete task", () => {
     DB.addTask(settings);
     DB.removeTask("customers-test");
 
     expect(DB.db.get("tasks").value().length).toBe(0);
+  });
+
+  it("should return all tasks", () => {
+    DB.addTask(settings);
+    DB.addTask(settings);
+
+    expect(DB.getAllTasks()).toEqual([settings, settings]);
   });
 });
 
