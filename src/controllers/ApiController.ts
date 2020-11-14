@@ -72,7 +72,7 @@ class ApiController {
     });
   }
 
-  downloadFiles(files: string[], output: (data: any) => void) {
+  downloadFiles(files: string[], output: (data: any) => Promise<{}>) {
     return async.forEachLimit(files, 1, (data, next) => {
       this.api
         .downloadResultFile(data)
