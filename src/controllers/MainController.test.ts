@@ -1,8 +1,6 @@
 import axios from "axios";
 import MainController from "./MainController";
 import sinon from "sinon";
-
-import { config as dotEndConfig } from "dotenv";
 import fs from "fs";
 import path from "path";
 
@@ -22,6 +20,10 @@ const settings = {
 
 jest.mock("axios");
 
+afterEach(() => {
+  MockFtp.clearDir(`${process.cwd()}/test_tmp/${settings.outputPath}`);
+});
+
 describe("exportAndUpload", () => {
   const clientDirectory = `${process.cwd()}/test_tmp`;
   const mockFtp = new MockFtp(clientDirectory, settings.taskName);
@@ -35,7 +37,7 @@ describe("exportAndUpload", () => {
 
   const main = new MainController(settings);
 
-  it("should invoke mock function with proper arguments", async () => {
+  it("should send 2 requests: start export and check", async () => {
     jest.setTimeout(30000);
     const fileResponseMock = fs.createReadStream(
       path.resolve(__dirname, "../../__mocks__/mock-xml.xml")
@@ -70,6 +72,11 @@ describe("exportAndUpload", () => {
     try {
       await main.exportAndUpload();
       expect(axios.post).toHaveBeenCalledTimes(2);
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(
+        fs.readdirSync(`${process.cwd()}/test_tmp/${settings.outputPath}`)
+          .length
+      ).toBe(5);
     } catch (error) {
       console.log(error);
     }
