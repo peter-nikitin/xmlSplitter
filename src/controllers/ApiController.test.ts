@@ -198,7 +198,7 @@ describe("e2e download -> split -> write", () => {
       fs.writeFileSync(
         `${process.cwd()}/test_tmp/${settings.outputPath}/${
           settings.taskName
-        }-${number}`,
+        }-${number}.xml`,
         data
       );
     };
@@ -234,7 +234,7 @@ describe("e2e download 2 files -> split -> write", () => {
       fs.writeFileSync(
         `${process.cwd()}/test_tmp/${settings.outputPath}/${
           settings.taskName
-        }-${number}-${(Math.random() * 1000).toFixed()}`,
+        }-${number}-${(Math.random() * 1000).toFixed()}.xml`,
         data
       );
     };
