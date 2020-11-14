@@ -5,6 +5,8 @@ import SplitterModel from "../models/SplitterModel";
 import fs from "fs";
 import path from "path";
 
+import MockFtp from "../../__mocks__/mockFtpServer";
+
 jest.mock("axios");
 
 const settings = {
@@ -50,6 +52,10 @@ const range = {
   sinceDateTimeUtc: moment().subtract(1, "day"),
   tillDateTimeUtc: moment(),
 };
+
+afterEach(() => {
+  MockFtp.clearDir(`${process.cwd()}/test_tmp/${settings.outputPath}`);
+});
 
 describe("checkExport", () => {
   it("should call api checkExport method", () => {
@@ -183,7 +189,9 @@ describe("e2e download -> split -> write", () => {
     const mockResponse = fs.createReadStream(
       path.resolve(__dirname, "../../__mocks__/mock-xml.xml")
     );
-    axios.get = jest.fn().mockResolvedValue(mockResponse);
+    axios.get = jest
+      .fn()
+      .mockResolvedValue({ status: 200, data: mockResponse });
     const splitter = new SplitterModel(settings);
 
     const mockWrite = (data: any, number: number) => {
@@ -202,5 +210,41 @@ describe("e2e download -> split -> write", () => {
     expect(
       fs.readdirSync(`${process.cwd()}/test_tmp/${settings.outputPath}`).length
     ).toBe(5);
+  });
+});
+
+describe("e2e download 2 files -> split -> write", () => {
+  it("splitter files should be in dir", async () => {
+    jest.setTimeout(30000);
+    const api = new ApiController(settings);
+
+    const mockResponse1 = fs.createReadStream(
+      path.resolve(__dirname, "../../__mocks__/mock-xml.xml")
+    );
+    const mockResponse2 = fs.createReadStream(
+      path.resolve(__dirname, "../../__mocks__/mock-xml.xml")
+    );
+    axios.get = jest
+      .fn()
+      .mockResolvedValueOnce({ status: 200, data: mockResponse1 })
+      .mockResolvedValueOnce({ status: 200, data: mockResponse2 });
+    const splitter = new SplitterModel(settings);
+
+    const mockWrite = (data: any, number: number) => {
+      fs.writeFileSync(
+        `${process.cwd()}/test_tmp/${settings.outputPath}/${
+          settings.taskName
+        }-${number}-${(Math.random() * 1000).toFixed()}`,
+        data
+      );
+    };
+
+    const output = (response: any) => splitter.splitFile(response, mockWrite);
+
+    await api.downloadFiles(["mockFile", "mockFile2"], output);
+
+    expect(
+      fs.readdirSync(`${process.cwd()}/test_tmp/${settings.outputPath}`).length
+    ).toBe(10);
   });
 });
