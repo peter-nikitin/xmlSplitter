@@ -30,7 +30,7 @@ class SplitterModel {
   splitFile(
     inputStream: NodeJS.ReadableStream,
     outputStream: (data: any, chunkNumber: number) => void
-  ) {
+  ): Promise<{}> {
     this.chunkNumber = 0;
 
     const xmlsplit = new XmlSplit(
