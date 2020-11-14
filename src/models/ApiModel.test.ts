@@ -92,7 +92,7 @@ describe("downloadResultFile", () => {
 
   const memoryStream = new MemoryStream();
 
-  it("should return stream", () => {
+  it("should return stream", async () => {
     const api = new ApiModel(settings);
 
     const apiAnswerMock = {
@@ -101,15 +101,15 @@ describe("downloadResultFile", () => {
     };
     axios.get = jest.fn().mockResolvedValue(apiAnswerMock);
 
-    api
-      .downloadResultFile("")
-      .then((response) =>
-        response.data.pipe(memoryStream).on("end", () => {
-          console.log(memoryStream.toString());
+    try {
+      const response = await api.downloadResultFile("");
+      return response.pipe(memoryStream).on("end", () => {
+        console.log(memoryStream.toString());
 
-          expect(memoryStream.toString()).toEqual(mocksXmlString);
-        })
-      )
-      .catch((err) => console.log(err));
+        expect(memoryStream.toString()).toEqual(mocksXmlString);
+      });
+    } catch (err) {
+      return console.log(err);
+    }
   });
 });
