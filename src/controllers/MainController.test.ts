@@ -12,9 +12,9 @@ import sinonStubs from "../../__mocks__/sinonStubs";
 
 const settings = {
   taskName: "mainController-test",
-  outputPath: "test",
-  tagName: "mainController-test",
-  itemsPerChunk: 50000,
+  outputPath: "mainController",
+  tagName: "customer",
+  itemsPerChunk: 1,
   operationName: "TestovyjEksportKlientov",
   exportPeriodHours: 24,
   cronTimerString: "0 03 19 * * *",
@@ -25,7 +25,6 @@ jest.mock("axios");
 describe("exportAndUpload", () => {
   const clientDirectory = `${process.cwd()}/test_tmp`;
   const mockFtp = new MockFtp(clientDirectory, settings.taskName);
-  let client: FtpModel;
 
   const sandbox = sinon.createSandbox();
 
@@ -33,7 +32,6 @@ describe("exportAndUpload", () => {
   mockFtp.startServer({
     url: `ftp://${process.env.FTP_HOST}:${process.env.FTP_PORT}`,
   });
-  mockFtp.checkTestDir(`${clientDirectory}/${settings.outputPath}`);
 
   const main = new MainController(settings);
 
@@ -42,6 +40,7 @@ describe("exportAndUpload", () => {
     const fileResponseMock = fs.createReadStream(
       path.resolve(__dirname, "../../__mocks__/mock-xml.xml")
     );
+    mockFtp.checkTestDir(`${clientDirectory}/${settings.outputPath}`);
 
     axios.post = jest
       .fn()
@@ -68,8 +67,12 @@ describe("exportAndUpload", () => {
       data: fileResponseMock,
     });
 
-    await main.exportAndUpload();
-    expect(axios.post).toHaveBeenCalledTimes(2);
+    try {
+      await main.exportAndUpload();
+      expect(axios.post).toHaveBeenCalledTimes(2);
+    } catch (error) {
+      console.log(error);
+    }
 
     sandbox.restore();
     mockFtp.server.close();
