@@ -38,32 +38,27 @@ class ApiController {
     );
 
     const resultedFiles = await this.regularCheckingExportStatus(
-      exportId.data.exportId
+      exportId.exportId
     );
     return resultedFiles;
   }
 
-  checkExport(
+  async checkExport(
     exportId: string,
     resolveCallback: (response: exportedFilesArray) => void,
     rejectCallback: (error: AxiosError) => void
   ) {
-    this.api
-      .checkExportResult(exportId)
-      .then((response) => {
-        if (response.status !== 200) {
-          rejectCallback(response.data);
+    try {
+      const response = await this.api.checkExportResult(exportId);
+      if (response.file.processingStatus === "Ready") {
+        if (this.interval) {
+          clearInterval(this.interval);
         }
-        if (response.data.file.processingStatus === "Ready") {
-          if (this.interval) {
-            clearInterval(this.interval);
-          }
-          resolveCallback(response.data.file.urls);
-        }
-      })
-      .catch((err) => {
-        throw new Error(err);
-      });
+        resolveCallback(response.file.urls);
+      }
+    } catch (err) {
+      rejectCallback(err);
+    }
   }
 
   regularCheckingExportStatus(exportId: string): Promise<exportedFilesArray> {
