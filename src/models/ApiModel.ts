@@ -20,54 +20,48 @@ class ApiModel {
     axiosRetry(axios, { retries: 5 });
   }
 
-  startExport(
-    sinceDateTimeUtc: string,
-    tillDateTimeUtc: string
-  ): Promise<AxiosResponse<ExportStarted>> {
-    return axios
-      .post(
-        `https://api.mindbox.ru/v3/operations/sync?endpointId=${this.endpoint}&operation=${this.settings.operationName}`,
-        {
-          sinceDateTimeUtc: sinceDateTimeUtc,
-          tillDateTimeUtc: tillDateTimeUtc,
+  async startExport(sinceDateTimeUtc: string, tillDateTimeUtc: string) {
+    const response = await axios.post(
+      `https://api.mindbox.ru/v3/operations/sync?endpointId=${this.endpoint}&operation=${this.settings.operationName}`,
+      {
+        sinceDateTimeUtc: sinceDateTimeUtc,
+        tillDateTimeUtc: tillDateTimeUtc,
+      },
+      {
+        timeout: 60000,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Mindbox secretKey="${this.secretKey}"`,
         },
-        {
-          timeout: 60000,
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Mindbox secretKey="${this.secretKey}"`,
-          },
-        }
-      )
-      .then((response) => response.data);
+      }
+    );
+    return response.data;
   }
 
-  checkExportResult(taskID: string) {
-    return axios
-      .post(
-        `https://api.mindbox.ru/v3/operations/sync?endpointId=${this.endpoint}&operation=${this.settings.operationName}`,
-        {
-          exportId: taskID,
+  async checkExportResult(taskID: string) {
+    const response = await axios.post(
+      `https://api.mindbox.ru/v3/operations/sync?endpointId=${this.endpoint}&operation=${this.settings.operationName}`,
+      {
+        exportId: taskID,
+      },
+      {
+        timeout: 60000,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Mindbox secretKey="${this.secretKey}"`,
         },
-        {
-          timeout: 60000,
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Mindbox secretKey="${this.secretKey}"`,
-          },
-        }
-      )
-      .then((response) => response.data);
+      }
+    );
+    return response.data;
   }
 
-  downloadResultFile(url: string) {
-    return axios
-      .get(url, {
-        responseType: "stream",
-      })
-      .then((response) => response.data);
+  async downloadResultFile(url: string) {
+    const response = await axios.get(url, {
+      responseType: "stream",
+    });
+    return response;
   }
 }
 
