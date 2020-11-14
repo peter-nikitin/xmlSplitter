@@ -1,14 +1,17 @@
 import ApiController from "./ApiController";
 import moment from "moment";
 import axios from "axios";
+import SplitterModel from "../models/SplitterModel";
+import fs from "fs";
+import path from "path";
 
 jest.mock("axios");
 
 const settings = {
-  taskName: "customers-test",
-  outputPath: "test",
+  taskName: "apiController-test",
+  outputPath: "apiController",
   tagName: "customer",
-  itemsPerChunk: 50000,
+  itemsPerChunk: 1,
   operationName: "TestovyjEksportKlientov",
   exportPeriodHours: 24,
   cronTimerString: "0 03 19 * * *",
@@ -169,5 +172,35 @@ describe("downloadFiles", () => {
     await api.downloadFiles(files, output);
 
     expect(output).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("e2e download -> split -> write", () => {
+  it("splitter files should be in dir", async () => {
+    jest.setTimeout(30000);
+    const api = new ApiController(settings);
+
+    const mockResponse = fs.createReadStream(
+      path.resolve(__dirname, "../../__mocks__/mock-xml.xml")
+    );
+    axios.get = jest.fn().mockResolvedValue(mockResponse);
+    const splitter = new SplitterModel(settings);
+
+    const mockWrite = (data: any, number: number) => {
+      fs.writeFileSync(
+        `${process.cwd()}/test_tmp/${settings.outputPath}/${
+          settings.taskName
+        }-${number}`,
+        data
+      );
+    };
+
+    const output = (response: any) => splitter.splitFile(response, mockWrite);
+
+    await api.downloadFiles(["mockFile"], output);
+
+    expect(
+      fs.readdirSync(`${process.cwd()}/test_tmp/${settings.outputPath}`).length
+    ).toBe(5);
   });
 });
