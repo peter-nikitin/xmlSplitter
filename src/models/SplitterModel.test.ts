@@ -2,12 +2,15 @@ import sinon from "sinon";
 import fs from "fs";
 import MemoryStream from "memorystream";
 import path from "path";
+import dotenv from "dotenv";
 
 import SplitterModel from "./SplitterModel";
 import { mocksXmlString } from "../../__mocks__/mock-xml-string";
 import FtpModel from "./FtpModel";
 import MockFtp from "../../__mocks__/mockFtpServer";
 import sinonStubs from "../../__mocks__/sinonStubs";
+
+dotenv.config();
 
 const settings = {
   taskName: "splitModel-test",
@@ -18,6 +21,11 @@ const settings = {
   exportPeriodHours: 24,
   cronTimerString: "0 03 19 * * *",
 };
+
+const clientDirectory = `${process.cwd()}/test_tmp`;
+afterAll(() => {
+  MockFtp.clearDir(`${clientDirectory}/${settings.outputPath}`);
+});
 
 describe("updateValue", () => {
   it("should return updated value for first chunk", () => {
@@ -96,39 +104,54 @@ describe("splitFile", () => {
 });
 
 describe("splitter + ftp", () => {
-  const clientDirectory = `${process.cwd()}/test_tmp`;
-  const mockFtp = new MockFtp(clientDirectory, settings.taskName);
+  let client: FtpModel;
+  let sandbox: sinon.SinonSandbox;
+  let mockFtp: MockFtp;
 
-  const sandbox = sinon.createSandbox();
+  beforeAll(() => {
+    sandbox = sinon.createSandbox();
+    sinonStubs(sandbox, "8806");
 
-  sinonStubs(sandbox, "8802");
-  mockFtp.startServer({
-    url: `ftp://${process.env.FTP_HOST}:${process.env.FTP_PORT}`,
+    mockFtp = new MockFtp(clientDirectory, settings.taskName);
+    mockFtp.checkTestDir(`${clientDirectory}/${settings.outputPath}`);
+    mockFtp.startServer({
+      url: `ftp://${process.env.FTP_HOST}:${process.env.FTP_PORT}`,
+    });
   });
-  const client = new FtpModel();
-  mockFtp.checkTestDir(`${clientDirectory}/${settings.outputPath}`);
 
-  it("should upload files to FTP", async () => {
+  afterAll(async () => {
+    await client.destroy();
+    await mockFtp.server.close();
+    sandbox.restore();
+  });
+
+  it("should upload files to FTP", async (done) => {
     jest.setTimeout(30000);
-    await client.init();
-
+    const splitter = new SplitterModel({ ...settings, itemsPerChunk: 1 });
+    client = new FtpModel();
     const mockReadableStream = fs.createReadStream(
       path.resolve(__dirname, "../../__mocks__/mock-xml.xml")
     );
-    const splitter = new SplitterModel({ ...settings, itemsPerChunk: 1 });
 
-    await splitter.splitFile(mockReadableStream, (data, chunkNumber) => {
+    const outputAfterSplitting = (data: any, chunkNumber: number) =>
       client.uploadFile(
-        `/${settings.outputPath}/${settings.taskName}-${chunkNumber}`,
+        `/${settings.outputPath}/${settings.taskName}-${chunkNumber}-${(
+          Math.random() * 1000
+        ).toFixed()}.xml`,
         data
       );
-    });
 
-    expect(
-      fs.readdirSync(`${clientDirectory}/${settings.outputPath}/`).length
-    ).toBe(5);
-    await client.destroy();
-    sandbox.restore();
-    await mockFtp.server.close();
+    await client.init();
+
+    const result = await splitter.splitFile(
+      mockReadableStream,
+      outputAfterSplitting
+    );
+    setTimeout(() => {
+      expect(
+        fs.readdirSync(`${clientDirectory}/${settings.outputPath}`).length
+      ).toBe(5);
+      done();
+    }, 4000);
   });
 });
