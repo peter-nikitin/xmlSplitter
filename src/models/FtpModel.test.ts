@@ -52,7 +52,7 @@ describe("FtpModel", () => {
       }
     });
 
-    it("should return list of files", async () => {
+    it("should return list of files", async (done) => {
       fs.writeFile(`${clientDirectory}/test.txt`, "test string", (err) => {
         if (err) {
           throw err;
@@ -67,20 +67,23 @@ describe("FtpModel", () => {
       const files = await client.listDir("/");
 
       expect(files.length).toBeGreaterThan(0);
+      done();
     });
 
-    it("should upload the file", async () => {
+    it("should upload the file", async (done) => {
       await client.uploadFile("/uploadedFile.txt", "test strings");
       const fileOnFtp = await client.listDir("/");
 
       expect(
         fileOnFtp.filter((file) => file === "uploadedFile.txt").length
       ).toBe(1);
+      done();
     });
   });
 
   describe("Rejections", () => {
     jest.setTimeout(30000);
+
     it("should throw error when ftp is turned-off", async () => {
       mockFtp.server.close();
       await client.destroy();
