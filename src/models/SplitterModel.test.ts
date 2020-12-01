@@ -113,7 +113,7 @@ describe("splitter + ftp", () => {
     sinonStubs(sandbox, "8806");
 
     mockFtp = new MockFtp(clientDirectory, settings.taskName);
-    mockFtp.checkTestDir(`${clientDirectory}/${settings.outputPath}`);
+    MockFtp.checkTestDir(`${clientDirectory}/${settings.outputPath}`);
     mockFtp.startServer({
       url: `ftp://${process.env.FTP_HOST}:${process.env.FTP_PORT}`,
     });

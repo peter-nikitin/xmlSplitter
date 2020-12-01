@@ -8,7 +8,7 @@ class MockFtp {
   logger: bunyan;
   clientDirectory: string;
 
-  checkTestDir(path: string): void {
+  static checkTestDir(path: string): void {
     if (!fs.existsSync(path)) {
       fs.mkdir(path, (err) => {
         throw err;

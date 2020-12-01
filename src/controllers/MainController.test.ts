@@ -50,7 +50,7 @@ describe("exportAndUpload", () => {
     const fileResponseMock = fs.createReadStream(
       path.resolve(__dirname, "../../__mocks__/mock-xml.xml")
     );
-    mockFtp.checkTestDir(`${clientDirectory}/${settings.outputPath}`);
+    MockFtp.checkTestDir(`${clientDirectory}/${settings.outputPath}`);
 
     axios.post = jest
       .fn()

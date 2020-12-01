@@ -53,6 +53,8 @@ const range = {
   tillDateTimeUtc: moment(),
 };
 
+MockFtp.checkTestDir(`${process.cwd()}/test_tmp/${settings.outputPath}`);
+
 afterEach(() => {
   MockFtp.clearDir(`${process.cwd()}/test_tmp/${settings.outputPath}`);
 });
@@ -88,10 +90,14 @@ describe("checkExport", () => {
     const resolve = jest.fn();
     const reject = jest.fn();
 
-    axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
+    try {
+      axios.post = jest.fn().mockResolvedValueOnce(mockAnswerReady);
 
-    await api.checkExport("123", resolve, reject);
-    expect(resolve).toHaveBeenCalledWith(mockAnswerReady.data.file.urls);
+      await api.checkExport("123", resolve, reject);
+      expect(resolve).toHaveBeenCalledWith(mockAnswerReady.data.file.urls);
+    } catch (error) {
+      console.log(error);
+    }
   });
 });
 
