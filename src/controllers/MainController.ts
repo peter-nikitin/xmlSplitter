@@ -13,25 +13,28 @@ class MainController {
     this.settings = settings;
     this.api = new ApiController(settings);
     this.splitter = new SplitterModel(settings);
+    this.handleDownloadedFile = this.handleDownloadedFile.bind(this);
+    this.outputAfterSplitting = this.outputAfterSplitting.bind(this);
+  }
+
+  outputAfterSplitting(data: any, chunkNumber: number) {
+    return this.ftp.uploadFile(
+      `/${this.settings.outputPath}/${this.settings.taskName}-${chunkNumber}-${(
+        Math.random() * 1000
+      ).toFixed()}.xml`,
+      data
+    );
+  }
+
+  handleDownloadedFile(response: NodeJS.ReadStream) {
+    return this.splitter.splitFile(response, this.outputAfterSplitting);
   }
 
   async exportAndUpload(range?: ExportRange) {
-    const outputAfterSplitting = (data: any, chunkNumber: number) =>
-      this.ftp.uploadFile(
-        `/${this.settings.outputPath}/${
-          this.settings.taskName
-        }-${chunkNumber}-${(Math.random() * 1000).toFixed()}.xml`,
-        data
-      );
-
-    const handleDownloadedFile = (response: NodeJS.ReadStream) => {
-      return this.splitter.splitFile(response, outputAfterSplitting);
-    };
-
     try {
-      const status = await this.ftp.init();
+      await this.ftp.init();
       const files = await this.api.exportData(range);
-      return this.api.downloadFiles(files, handleDownloadedFile);
+      return this.api.downloadFiles(files, this.handleDownloadedFile);
     } catch (err) {
       return console.log(err);
     }

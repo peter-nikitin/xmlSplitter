@@ -1,4 +1,4 @@
-import CronModel from "./CronModel";
+import CronModel from "../models/CronModel";
 import moment from "moment";
 import { resolve } from "path";
 import { reject } from "async";

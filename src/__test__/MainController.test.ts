@@ -1,5 +1,5 @@
 import axios from "axios";
-import MainController from "./MainController";
+import MainController from "../controllers/MainController";
 import sinon from "sinon";
 import fs from "fs";
 import path from "path";

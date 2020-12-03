@@ -4,7 +4,7 @@ import moment from "moment";
 import path from "path";
 import axios from "axios";
 
-import ApiModel from "./ApiModel";
+import ApiModel from "../models/ApiModel";
 
 import { mocksXmlString } from "../../__mocks__/mock-xml-string";
 

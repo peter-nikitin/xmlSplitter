@@ -4,9 +4,9 @@ import MemoryStream from "memorystream";
 import path from "path";
 import dotenv from "dotenv";
 
-import SplitterModel from "./SplitterModel";
+import SplitterModel from "../models/SplitterModel";
 import { mocksXmlString } from "../../__mocks__/mock-xml-string";
-import FtpModel from "./FtpModel";
+import FtpModel from "../models/FtpModel";
 import MockFtp from "../../__mocks__/mockFtpServer";
 import sinonStubs from "../../__mocks__/sinonStubs";
 

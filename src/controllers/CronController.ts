@@ -6,14 +6,12 @@ import db from "../db";
 import { Settings } from "../declare/types.d";
 
 class CronController {
-  cron: number;
   tasks: CronModel[] = [];
 
-  constructor() {
-    this.cron = 1;
-  }
+  constructor() {}
 
   setCronJob(operationSettings: Settings) {
+    // TODO: написать нормальную функцию
     const newCronJob = new CronModel(operationSettings, () => {});
     this.tasks.push(newCronJob);
   }

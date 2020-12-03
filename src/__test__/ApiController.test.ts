@@ -1,4 +1,4 @@
-import ApiController from "./ApiController";
+import ApiController from "../controllers/ApiController";
 import moment from "moment";
 import axios from "axios";
 import SplitterModel from "../models/SplitterModel";

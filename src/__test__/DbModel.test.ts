@@ -1,7 +1,7 @@
 import fs from "fs";
 import { brotliDecompress } from "zlib";
 
-import DbModel from "./DbModel";
+import DbModel from "../models/DbModel";
 
 // import low from "lowdb";
 // import Memory from "lowdb/adapters/Memory";
