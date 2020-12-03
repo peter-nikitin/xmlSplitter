@@ -1,5 +1,5 @@
 import path from "path";
-import DbController from "../controllers/DbController";
+import DbController from "../models/DbModel";
 
 const dbController = new DbController(path.join(__dirname, "../db/db.json"));
 
