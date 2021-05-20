@@ -1,7 +1,5 @@
 import CronModel from "../models/CronModel";
 import moment from "moment";
-import { resolve } from "path";
-import { reject } from "async";
 
 const settings = {
   taskName: "customers-test",
@@ -39,7 +37,7 @@ describe("cron ", () => {
     expect(tick).toHaveBeenCalledTimes(1);
   });
 
-  it("should init and run ", async () => {
+  it("should return date of last tick ", async () => {
     jest.setTimeout(30000);
     const tick = jest.fn();
     const firstStart = moment().add(2, "second");

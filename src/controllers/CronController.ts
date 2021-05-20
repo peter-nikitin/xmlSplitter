@@ -1,5 +1,7 @@
 import moment from "moment";
 
+import MainController from "../controllers/MainController";
+
 import CronModel from "../models/CronModel";
 import db from "../db";
 
@@ -12,7 +14,14 @@ class CronController {
 
   setCronJob(operationSettings: Settings) {
     // TODO: написать нормальную функцию
-    const newCronJob = new CronModel(operationSettings, () => {});
+    const newCronJob = new CronModel(operationSettings, () => {
+      try {
+        const main = new MainController(operationSettings);
+        main.exportAndUpload();
+      } catch (error) {
+        throw error;
+      }
+    });
     this.tasks.push(newCronJob);
   }
 
@@ -30,4 +39,4 @@ class CronController {
   }
 }
 
-export default new CronController();
+export default CronController;

@@ -7,20 +7,20 @@ import CronController from "../controllers/CronController";
 import dbController from "../db/index";
 
 operationRouter.get("/", (req, res) => {
-  res.json(dbController.getOperations());
+  res.json(dbController.getAllTasks());
 });
 
 operationRouter.get("/:operation", (req, res) => {
-  res.json(
-    CronController.tasks.filter(
-      (task) => task.settings.operationName === req.params.operation
-    )
-  );
+  // res.json(
+  //   CronController.tasks.filter(
+  //     (task) => task.settings.operationName === req.params.operation
+  //   )
+  // );
 });
 
 operationRouter.post("/", (req, res) => {
   if (req.get("Authorization") === process.env.SECRET_KEY) {
-    dbController.saveOperation(req.body);
+    dbController.addTask(req.body);
     res.send("OK");
   } else {
     res.status(400).send("unAuthorize");
@@ -29,7 +29,7 @@ operationRouter.post("/", (req, res) => {
 
 operationRouter.put("/", (req, res) => {
   if (req.get("Authorization") === process.env.SECRET_KEY) {
-    dbController.updateOperation(req.body);
+    dbController.updateTask(req.body);
     res.send("OK");
   } else {
     res.status(400).send("unAuthorize");
@@ -38,7 +38,7 @@ operationRouter.put("/", (req, res) => {
 
 operationRouter.delete("/:operation", (req, res) => {
   if (req.get("Authorization") === process.env.SECRET_KEY) {
-    dbController.removeOperation(req.params.operation);
+    dbController.removeTask(req.params.operation);
     console.log(req.params.operation);
 
     res.send("OK");

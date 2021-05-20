@@ -9,9 +9,16 @@ interface Logs {
   logString: string;
 }
 
+interface RangeForNextTick {
+  taskName: string;
+  sinceDateTime: string;
+  tillDateTime: string;
+}
+
 interface DBSchema {
   tasks: Settings[];
   logs: Logs[];
+  rangesForNextTick?: RangeForNextTick[];
 }
 
 class DbModel {
@@ -53,6 +60,18 @@ class DbModel {
       .value()
       .filter((item) => item.task === task)
       .reverse();
+  }
+
+  getRangeForNextTick(taskName: string): RangeForNextTick {
+    return this.db.get("rangesForNextTick").find({ taskName }).value();
+  }
+
+  setRangeForNextTick(taskName: string, newRange: RangeForNextTick): void {
+    this.db
+      .get("rangesForNextTick")
+      .find({ taskName })
+      .assign({ ...newRange })
+      .write();
   }
 
   saveLog(task: string, log: string) {

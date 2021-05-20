@@ -1,9 +1,12 @@
 import axios from "axios";
-import MainController from "../controllers/MainController";
 import sinon from "sinon";
 import fs from "fs";
 import path from "path";
 import dotnev from "dotenv";
+import moment from "moment";
+
+import MainController from "../controllers/MainController";
+import CronController from "../controllers/CronController";
 
 import MockFtp from "../../__mocks__/mockFtpServer";
 import sinonStubs from "../../__mocks__/sinonStubs";
@@ -11,13 +14,13 @@ import sinonStubs from "../../__mocks__/sinonStubs";
 dotnev.config();
 
 const settings = {
-  taskName: "mainController-test",
-  outputPath: "mainController",
+  taskName: "cronController-test",
+  outputPath: "cronController",
   tagName: "customer",
   itemsPerChunk: 1,
   operationName: "TestovyjEksportKlientov",
   exportPeriodHours: 24,
-  cronTimerString: "0 03 19 * * *",
+  cronTimerString: `${moment().add(2, "second").format("ss mm HH")} * * *`,
 };
 
 jest.mock("axios");
@@ -31,25 +34,25 @@ const mockFtp = new MockFtp(clientDirectory, settings.taskName);
 
 const sandbox = sinon.createSandbox();
 
-sinonStubs(sandbox, "8803");
+sinonStubs(sandbox, "8805");
 mockFtp.startServer({
   url: `ftp://${process.env.FTP_HOST}:${process.env.FTP_PORT}`,
 });
 
 const main = new MainController(settings);
+MockFtp.checkTestDir(`${clientDirectory}/${settings.outputPath}`);
 
 afterAll(async () => {
   sandbox.restore();
   mockFtp.server.close();
 });
 
-describe("exportAndUpload", () => {
-  it("should send 2 requests: start export and check", async (done) => {
-    jest.setTimeout(30000);
+describe("main e2e test", () => {
+  it("should split file by cron without custom range", async (done) => {
+    jest.setTimeout(300000);
     const fileResponseMock = fs.createReadStream(
       path.resolve(__dirname, "../../__mocks__/mock-xml.xml")
     );
-    MockFtp.checkTestDir(`${clientDirectory}/${settings.outputPath}`);
 
     axios.post = jest
       .fn()
@@ -76,15 +79,21 @@ describe("exportAndUpload", () => {
       data: fileResponseMock,
     });
 
-    await main.exportAndUpload();
-    expect(axios.post).toHaveBeenCalledTimes(2);
-    expect(axios.get).toHaveBeenCalledTimes(1);
-    setTimeout(() => {
-      expect(
-        fs.readdirSync(`${process.cwd()}/test_tmp/${settings.outputPath}`)
-          .length
-      ).toBe(5);
-      done();
-    }, 5000);
+    try {
+      const cron = new CronController();
+      cron.setCronJob(settings);
+
+      expect(axios.post).toHaveBeenCalledTimes(2);
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      setTimeout(() => {
+        expect(
+          fs.readdirSync(`${process.cwd()}/test_tmp/${settings.outputPath}`)
+            .length
+        ).toBe(5);
+        done();
+      }, 10000);
+    } catch (error) {
+      console.log(error);
+    }
   });
 });

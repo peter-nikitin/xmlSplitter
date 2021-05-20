@@ -3,7 +3,7 @@
 import sinon from "sinon";
 import fs from "fs";
 
-import FtpModel from "./FtpModel";
+import FtpModel from "../models/FtpModel";
 import MockFtp from "../../__mocks__/mockFtpServer";
 import sinonStubs from "../../__mocks__/sinonStubs";
 

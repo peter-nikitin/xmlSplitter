@@ -4,6 +4,8 @@ import db from "../db/index";
 
 import { Settings } from "../declare/types.d";
 
-const operations = db.getOperations();
+const operations = db.getAllTasks();
 
-operations.map((item: Settings) => CronController.setCronJob(item));
+const cron = new CronController();
+
+operations.map((item: Settings) => cron.setCronJob(item));
