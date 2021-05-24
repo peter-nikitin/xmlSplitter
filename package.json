@@ -5,11 +5,21 @@
   "scripts": {
     "start": "node ./bin/www",
     "test": "jest --coverage",
+    "test:dev": "jest --watch",
     "build": "tsc",
     "lint": "eslint . & echo 'lint complete'",
     "dev": "ts-node-dev --respawn --transpile-only  ./src/server.ts",
     "prod": "tsc && node ./built/src/app.js",
     "debug": "tsc && node --inspect ./built/src/app.js"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(css|less)$": "<rootDir>/src/__mocks__/styleMock.js",
+      "^client/(.*)": "<rootDir>/src/client/$1",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/__mocks__/fileMock.js",
+      "^src/(.*)": "<rootDir>/src/$1",
+      "^server/(.*)": "<rootDir>/src/server/$1"
+    }
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.2",
@@ -38,6 +48,13 @@
     "xmlsplit": "^1.2.8"
   },
   "devDependencies": {
+    "@babel/core": "^7.13.8",
+    "@babel/preset-env": "^7.13.8",
+    "@babel/preset-react": "^7.12.13",
+    "@babel/preset-typescript": "^7.13.0",
+    "@testing-library/dom": "^7.28.0",
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^11.2.5",
     "@types/async": "^3.2.3",
     "@types/bunyan": "^1.8.6",
     "@types/http-errors": "^1.8.0",
@@ -46,7 +63,11 @@
     "@types/sinon": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^4.4.1",
     "@typescript-eslint/parser": "^4.4.1",
+    "awesome-typescript-loader": "^5.2.1",
+    "babel-jest": "^26.6.3",
+    "babel-loader": "^8.2.2",
     "bunyan": "^1.8.14",
+    "css-loader": "^5.1.0",
     "eslint": "^7.2.0",
     "eslint-config-airbnb": "^18.2.0",
     "eslint-config-airbnb-typescript": "^11.2.1",
@@ -54,14 +75,24 @@
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.20.6",
-    "eslint-plugin-react-hooks": "^4.0.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "file-loader": "^6.2.0",
     "ftp-srv": "^4.3.4",
-    "jest": "^26.5.3",
+    "html-webpack-plugin": "^5.2.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^26.6.3",
+    "jsdom": "^16.4.0",
     "memorystream": "^0.3.1",
     "sinon": "^9.2.0",
-    "ts-jest": "^26.4.1",
+    "style-loader": "^2.0.0",
+    "supertest": "^6.0.1",
+    "ts-jest": "^26.5.3",
+    "ts-loader": "^8.0.11",
     "ts-node": "^9.0.0",
-    "ts-node-dev": "^1.0.0",
-    "typescript": "^4.0.3"
+    "tsconfig-paths-webpack-plugin": "^3.3.0",
+    "typescript": "^4.0.5",
+    "webpack": "^5.24.2",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.2"
   }
 }
