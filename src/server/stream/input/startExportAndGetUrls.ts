@@ -7,7 +7,7 @@ import {
   ExportStartedResponse,
   CheckExportRequest,
   ExportStatusResponse,
-} from "../../types";
+} from "src/@types";
 
 axiosRetry(axios, { retries: 5 });
 
@@ -76,7 +76,8 @@ const startExportAndGetUrls = async (
   const exportId = await startExport(startExportParams);
 
   const intervalMinute = 1;
-  const intervalMilliseconds = intervalMinute * 60 * 1000;
+  const intervalMilliseconds =
+    process.env.NODE_ENV === "test" ? 1 : intervalMinute * 60 * 1000;
 
   return new Promise((resolve) => {
     const interval = setInterval(async () => {
