@@ -1,10 +1,10 @@
 import fs from "fs";
 import XmlSplit from "xmlsplit";
 
-import { Settings } from "../../types";
+import { Settings } from "src/@types";
 
 // fix start and end tags after splitting
-const replaceResultTag = (
+export const replaceResultTag = (
   data: string,
   tagName: string,
   chunkNumber: number
