@@ -46,6 +46,11 @@ class MockFtp {
 
     return this.server.listen();
   }
+
+  listOfFiles(path: string) {
+    return fs.readdirSync(path);
+  }
+
   static clearDir(path: string) {
     const files = fs.readdirSync(path);
     files.map((fileName) => fs.unlinkSync(`${path}/${fileName}`));
