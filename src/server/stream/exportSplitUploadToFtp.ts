@@ -20,20 +20,20 @@ const exportSplitUploadToFtp = async (
     ...exportRange,
   });
 
+  const ftpConnection = await ftp(ftpSettings);
+
+  const uploadChunk = async (file: string, chunkNumber: number) => {
+    const path = `/${settings.outputPath}/${
+      settings.taskName
+    }-${chunkNumber}-${(Math.random() * 1000).toFixed()}.xml`;
+
+    await ftpConnection.uploadFile(path, file);
+  };
+
   if (files && files.length) {
-    const ftpConnection = await ftp(ftpSettings);
-
-    const uploadResult = async (file, chunkNumber) => {
-      const path = `/${settings.outputPath}/${
-        settings.taskName
-      }-${chunkNumber}-${(Math.random() * 1000).toFixed()}.xml`;
-
-      await ftpConnection.uploadFile(path, file);
-    };
-
     for await (let file of files) {
       const downloadingFileStream = await downloadFile(file);
-      splitXmlFile(downloadingFileStream, uploadResult(), settings);
+      splitXmlFile(downloadingFileStream, uploadChunk, settings);
     }
   }
 };

@@ -2,7 +2,7 @@ import CronController from "./CronController";
 
 import db from "../db/index";
 
-import { Settings } from "../types";
+import { Settings } from "../../types";
 
 const operations = db.getAllTasks();
 

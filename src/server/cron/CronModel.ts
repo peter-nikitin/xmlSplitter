@@ -1,7 +1,7 @@
 import { CronJob } from "cron";
 import moment from "moment";
 
-import { Settings } from "../types";
+import { Settings } from "../../types";
 
 class CronModel {
   settings: Settings;
