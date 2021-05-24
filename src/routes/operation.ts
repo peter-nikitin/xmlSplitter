@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 
 const operationRouter = express.Router();
-import CronController from "../controllers/CronController";
+import CronController from "../cron/CronController";
 
 import dbController from "../db/index";
 

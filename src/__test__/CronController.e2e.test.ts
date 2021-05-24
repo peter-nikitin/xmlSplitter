@@ -5,8 +5,8 @@ import path from "path";
 import dotnev from "dotenv";
 import moment from "moment";
 
-import MainController from "../controllers/MainController";
-import CronController from "../controllers/CronController";
+import MainController from "../stream/MainController";
+import CronController from "../cron/CronController";
 
 import MockFtp from "../../__mocks__/mockFtpServer";
 import sinonStubs from "../../__mocks__/sinonStubs";
@@ -49,6 +49,7 @@ afterAll(async () => {
 
 describe("main e2e test", () => {
   it("should split file by cron without custom range", async (done) => {
+    jest.useFakeTimers();
     jest.setTimeout(300000);
     const fileResponseMock = fs.createReadStream(
       path.resolve(__dirname, "../../__mocks__/mock-xml.xml")
@@ -82,7 +83,7 @@ describe("main e2e test", () => {
     try {
       const cron = new CronController();
       cron.setCronJob(settings);
-
+      jest.runAllTimers();
       expect(axios.post).toHaveBeenCalledTimes(2);
       expect(axios.get).toHaveBeenCalledTimes(1);
       setTimeout(() => {

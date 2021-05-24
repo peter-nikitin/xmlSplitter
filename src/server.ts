@@ -2,7 +2,7 @@ import http from "http";
 
 import app from "./app";
 
-import "./utils/addCronTasksOnServerStart";
+import "./cron/addCronTasksOnServerStart";
 
 const port = process.env.PORT || 8080;
 
