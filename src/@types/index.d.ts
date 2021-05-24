@@ -1,3 +1,5 @@
+declare module "xmlsplit";
+
 import DbController from "../controllers/DbController";
 
 export type Settings = {
