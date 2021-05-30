@@ -2,41 +2,44 @@ import moment from "moment";
 
 import exportSplitUploadToFtp from "../stream/exportSplitUploadToFtp";
 
-import CronModel from "./CronModel";
+import createCronJob from "./createCronJob";
 import db from "../db";
 
-import { Settings } from "../types";
+import { Settings, CronJobItem } from "src/@types";
 
-class CronController {
-  tasks: CronModel[] = [];
+class CronJobArray {
+  tasks: { name: string; job: CronJobItem }[];
 
-  constructor() {}
+  constructor(jobsArray: [Settings]) {
+    this.tasks = jobsArray.map((task: Settings) => this.setCronJob(task));
+  }
 
   setCronJob(operationSettings: Settings) {
-    // TODO: написать нормальную функцию
-    const newCronJob = new CronModel(operationSettings, () => {
-      try {
-        const main = new exportSplitUploadToFtp(operationSettings);
-        main.exportAndUpload();
-      } catch (error) {
-        throw error;
-      }
-    });
-    this.tasks.push(newCronJob);
+    const newCronJob = createCronJob(operationSettings, () =>
+      exportSplitUploadToFtp(operationSettings)
+    );
+    return {
+      name: operationSettings.taskName,
+      job: newCronJob,
+    };
+  }
+  addCronJob(operationSettings: Settings) {
+    const newCronJob = createCronJob(operationSettings, () =>
+      exportSplitUploadToFtp(operationSettings)
+    );
+    this.tasks.push({ name: operationSettings.taskName, job: newCronJob });
   }
 
   getCronJob(name: string) {
-    const foundedCronJob = this.tasks.filter(
-      (item) => item.settings.taskName === name
-    );
+    const foundedCronJob = this.tasks.filter((item) => item.name === name);
 
     if (foundedCronJob.length === 0) return { status: "notFound" };
     return {
       status: "found",
-      nextTick: foundedCronJob[0].getNextDate(),
-      lastTick: foundedCronJob[0].getLastDate(),
+      nextTick: foundedCronJob[0].job.getNextDate(),
+      lastTick: foundedCronJob[0].job.getLastDate(),
     };
   }
 }
 
-export default CronController;
+export default CronJobArray;
