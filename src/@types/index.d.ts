@@ -56,3 +56,9 @@ export type FtpSettings = {
   password: string;
   port: number;
 };
+
+export type CronJobItem = {
+  job: CronJob;
+  getLastDate: () => string;
+  getNextDate: () => string;
+};
