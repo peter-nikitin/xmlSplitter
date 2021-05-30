@@ -1,6 +1,9 @@
-import FtpModel from "./output/ftp";
-import { Settings, RequestSettings, ExportRange, FtpSettings } from "../types";
-import SplitterModel from "./modifications/splitXmlFile";
+import {
+  Settings,
+  RequestSettings,
+  ExportRange,
+  FtpSettings,
+} from "src/@types/index";
 
 import startExportAndGetUrls from "./input/startExportAndGetUrls";
 import downloadFile from "./input/downloadFile";
@@ -9,12 +12,19 @@ import splitXmlFile from "./modifications/splitXmlFile";
 
 import ftp from "./output/ftp";
 
-const exportSplitUploadToFtp = async (
-  settings: Settings,
-  requestSettings: RequestSettings,
-  exportRange: ExportRange,
-  ftpSettings: FtpSettings
-) => {
+type createStreamType = {
+  settings: Settings;
+  requestSettings: RequestSettings;
+  exportRange: ExportRange;
+  ftpSettings: FtpSettings;
+};
+
+const exportSplitUploadToFtp = async ({
+  settings,
+  requestSettings,
+  exportRange,
+  ftpSettings,
+}: createStreamType) => {
   const files = await startExportAndGetUrls({
     ...requestSettings,
     ...exportRange,
