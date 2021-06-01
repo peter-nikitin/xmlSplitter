@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "jest --coverage",
-    "test:dev": "jest --watch",
+    "test": "jest",
+    "test:dev": "jest --watch --coverage",
     "build": "tsc",
     "lint": "eslint . & echo 'lint complete'",
-    "dev": "ts-node-dev --respawn --transpile-only  ./src/server.ts",
+    "dev": "ts-node  ./src/server/server.ts --project tsconfig.json",
     "prod": "tsc && node ./built/src/app.js",
     "debug": "tsc && node --inspect ./built/src/app.js"
   },
