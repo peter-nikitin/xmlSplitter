@@ -1,5 +1,5 @@
 {
-  "operations": [
+  "tasks": [
     {
       "taskName": "customers-test",
       "outputPath": "test",
@@ -12,37 +12,37 @@
   ],
   "logs": [
     {
-      "operation": "customers-test",
+      "tasks": "customers-test",
       "date": "2020-10-20T16:01:40.973Z",
       "data": "Поставлена регулярная задача. Следующее выполнение 20.10.2020 19:03"
     },
     {
-      "operation": "TestovyjEksportKlientov",
+      "tasks": "TestovyjEksportKlientov",
       "date": "2020-10-20T16:03:00.627Z",
       "data": "Поставлена задача экспорта №: 49386"
     },
     {
-      "operation": "TestovyjEksportKlientov",
+      "tasks": "TestovyjEksportKlientov",
       "date": "2020-10-20T16:04:01.022Z",
       "data": "Проверяем задачу. Статус: Ready"
     },
     {
-      "operation": "TestovyjEksportKlientov",
+      "tasks": "TestovyjEksportKlientov",
       "date": "2020-10-20T16:04:01.411Z",
       "data": "✂️  Поделили файлик на 1 кусков. "
     },
     {
-      "operation": "customers-test",
+      "tasks": "customers-test",
       "date": "2020-10-20T16:04:01.412Z",
       "data": "✅ Успешно завершено. Экспортировано, поделено, загружено на ФТП"
     },
     {
-      "operation": "customers-test",
+      "tasks": "customers-test",
       "date": "2020-10-20T16:04:58.065Z",
       "data": "Поставлена регулярная задача. Следующее выполнение 21.10.2020 19:03"
     },
     {
-      "operation": "customers-test",
+      "tasks": "customers-test",
       "date": "2020-10-20T16:05:23.707Z",
       "data": "Поставлена регулярная задача. Следующее выполнение 21.10.2020 19:03"
     }
