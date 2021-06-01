@@ -2,20 +2,11 @@ import express from "express";
 import path from "path";
 
 const operationRouter = express.Router();
-import CronController from "../cron/CronController";
 
 import dbController from "../db/index";
 
 operationRouter.get("/", (req, res) => {
   res.json(dbController.getAllTasks());
-});
-
-operationRouter.get("/:operation", (req, res) => {
-  // res.json(
-  //   CronController.tasks.filter(
-  //     (task) => task.settings.operationName === req.params.operation
-  //   )
-  // );
 });
 
 operationRouter.post("/", (req, res) => {
