@@ -19,7 +19,7 @@ class ApiController {
   }
 
   startExport() {
-    const tillDate = moment().utc().format("DD.MM.YYY");
+    const tillDate = moment().utc().format("DD.MM.YYYY");
     const sinceDate = moment()
       .subtract(this.exportPeriodHours, "hours")
       .utc()
